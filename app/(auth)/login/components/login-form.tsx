@@ -130,7 +130,6 @@ export function LoginForm({ onLogin, error }: LoginFormProps) {
           アカウントをお持ちでない方は
         </p>
         <Button
-          variant="outline"
           className="w-full border-2 border-purple-600 text-purple-600 hover:bg-purple-50 font-medium"
           onClick={() => window.location.href = '/signup'}
         >
