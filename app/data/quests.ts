@@ -1,4 +1,5 @@
 import { Quest } from '@/types/quest';
+import { getQuestImagePath } from '@/lib/utils/image';
 
 // 固定の時間を使用して一貫性を保つ
 const generateTimeSlots = () => {
@@ -17,15 +18,15 @@ const generateQuests = () => {
   const quests: Quest[] = [
     {
       id: "1",
-      title: "【伝統工芸】別府竹細工の職人体験",
+      title: "【伝統工芸】別府竹細工クエスト",
       description: "伝統ある別府竹細工の技法を学びながら、実際の制作体験ができます。職人から直接指導を受けられる貴重な機会です。",
       difficulty: "★★",
-      date: new Date(2025, 2, 15),
+      date: new Date(2025, 1, 3),  //2月5日
       startTime: "09:00",
       location: {
-        address: "大分県別府市鉄輪町",
+        address: "大分県別府市",
         access: "別府駅からバスで15分"
-      },
+      },  
       tickets: {
         available: 10,
         price: 8500
@@ -43,7 +44,7 @@ const generateQuests = () => {
           }
         ]
       },
-      image: "https://images.unsplash.com/photo-1580933073521-dc49ac0d4e6a",
+      image: getQuestImagePath('竹細工.png'),
       reward: {
         cardNumber: "No.001",
         cardName: "竹職人の誇り"
@@ -51,18 +52,19 @@ const generateQuests = () => {
     },
     {
       id: "2",
-      title: "【農業】有機野菜の収穫体験",
-      description: "有機栽培にこだわった農園での収穫体験です。農業の基礎から収穫方法まで丁寧に指導します。",
-      difficulty: "★★★",
-      date: new Date(2025, 2, 15),
+      title: "【農業】かぼすの収穫クエスト",
+      description: 
+      "大分県臼杵市で、かぼす収穫作業に参加しませんか？近年、担い手不足により農業経営が厳しい状況にあります。そこで、農業に興味があり、地域に貢献したいと考える方、新しい挑戦に意欲的な方の参加を求めています。代々受け継がれた農園での作業を通して、地元の恵みを実際に手にする貴重な体験ができます。また、収穫の合間には地元の方々との温かな交流を楽しみ、人と人との繋がりを実感していただけます。",
+      difficulty: "★",
+      date: new Date(2025, 1, 4),   //2月4日
       startTime: "07:30",
       location: {
-        address: "大分県杵築市山香町",
-        access: "JR杵築駅からバスで20分"
+        address: "大分県臼杵市",
+        access: "臼杵駅からバスで20分"
       },
       tickets: {
-        available: 15,
-        price: 7500
+        available: 5,
+        price: 3000
       },
       reviews: {
         rating: 4.9,
@@ -72,12 +74,12 @@ const generateQuests = () => {
             id: "r2",
             author: "農業初心者",
             rating: 5,
-            comment: "土づくりから収穫まで、農業の基礎を学べました。",
-            date: new Date(2025, 1, 25)
+            comment: "優しい指導のもと、楽しく収穫作業が行えました。",
+            date: new Date(2024, 11, 25)
           }
         ]
       },
-      image: "https://images.unsplash.com/photo-1523348837708-15d4a09cfac2",
+      image: getQuestImagePath('収穫.png'),
       reward: {
         cardNumber: "No.002",
         cardName: "大地の恵み"
@@ -85,13 +87,13 @@ const generateQuests = () => {
     },
     {
       id: "3",
-      title: "【祭事】日田祇園祭の準備体験",
+      title: "【祭事】祇園祭の準備クエスト",
       description: "ユネスコ無形文化遺産に登録された日田祇園祭の準備作業を体験できます。",
       difficulty: "★★",
-      date: new Date(2025, 2, 16),
+      date: new Date(2025, 1, 16),  //2月16日
       startTime: "10:00",
       location: {
-        address: "大分県日田市豆田町",
+        address: "大分県日田市",
         access: "JR日田駅から徒歩15分"
       },
       tickets: {
@@ -111,22 +113,55 @@ const generateQuests = () => {
           }
         ]
       },
-      image: "https://images.unsplash.com/photo-1528372444006-1bfc81acab02",
+      image: getQuestImagePath('お祭り.png'),
       reward: {
         cardNumber: "No.003",
         cardName: "祭魂"
       }
-    }
+    },
+    // {
+    //   id: "4",
+    //   title: "【林業】伐採クエスト",
+    //   description: "伐採作業のお手伝いをお願いします",
+    //   difficulty: "★★",
+    //   date: new Date(2025, 1, 7),  //2月7日
+    //   startTime: "10:00",
+    //   location: {
+    //     address: "大分県日田市",
+    //     access: "JR日田駅から徒歩15分"
+    //   },
+    //   tickets: {
+    //     available: 20,
+    //     price: 4500
+    //   },
+    //   reviews: {
+    //     rating: 4.7,
+    //     count: 15,
+    //     comments: [
+    //       {
+    //         id: "r3",
+    //         author: "大分最高",
+    //         rating: 5,
+    //         comment: "伐採作業の大変さをしりました",
+    //         date: new Date(2025, 2, 1)
+    //       }
+    //     ]
+    //   },
+    //   image: getQuestImagePath('林業.png'),
+    //   reward: {
+    //     cardNumber: "No.006",
+    //     cardName: "大自然の息吹"
+    //   }
+    // }
   ];
 
   // 追加のクエストを生成
   const categories = [
-    { name: "伝統工芸", basePrice: 8000 },
-    { name: "農業", basePrice: 7000 },
-    { name: "祭事", basePrice: 6500 },
-    { name: "漁業", basePrice: 7500 },
-    { name: "介護", basePrice: 6000 },
-    { name: "保育", basePrice: 6000 }
+    { name: "伝統工芸", basePrice: 5000 },
+    { name: "農業", basePrice: 4000 },
+    { name: "祭事", basePrice: 8000 },
+    { name: "漁業", basePrice: 6000 },
+    { name: "林業", basePrice: 3000 },
   ];
 
   const locations = [
@@ -137,12 +172,12 @@ const generateQuests = () => {
     { address: "大分県臼杵市", access: "臼杵駅から徒歩15分" }
   ];
 
-  // 17個の追加クエストを生成（合計20個になるように）
-  for (let i = 0; i < 17; i++) {
+  // 追加クエストを生成（合計5個になるように）
+  for (let i = 0; i < 1; i++) {
     const category = categories[i % categories.length];
     const location = locations[i % locations.length];
     const dateOffset = Math.floor(i / 3); // 3件ずつ異なる日付に分散
-    const date = new Date(2025, 2, 15 + dateOffset);
+    const date = new Date(2025, 1, 15 + dateOffset);   //2月15日
     const timeSlotIndex = Math.floor(Math.random() * TIME_SLOTS.length);
 
     quests.push({
@@ -166,7 +201,7 @@ const generateQuests = () => {
             author: "参加者",
             rating: 5,
             comment: generateComment(category.name),
-            date: new Date(2025, 2, 1)
+            date: new Date(2025, 1, 1)
           }
         ]
       },
@@ -183,12 +218,11 @@ const generateQuests = () => {
 
 function generateQuestTitle(category: string, index: number): string {
   const titles: Record<string, string[]> = {
-    "伝統工芸": ["伝統的な織物体験", "陶芸ワークショップ", "漆器制作体験"],
-    "農業": ["有機野菜の収穫", "果樹園での収穫体験", "田植え体験"],
-    "祭事": ["地域祭りの準備", "伝統行事のサポート", "神輿担ぎ体験"],
-    "漁業": ["朝市での魚の仕分け", "定置網漁体験", "養殖場でのサポート"],
-    "介護": ["デイサービスでの介護補助", "高齢者との交流会", "介護施設でのレクリエーション"],
-    "保育": ["保育園での保育補助", "子どもと遊ぼう", "園児と野外活動"]
+    "伝統工芸": ["伝統的クエスト", "陶芸ワークショップクエスト", "漆器制作クエスト"],
+    "農業": ["有機野菜の収穫クエスト", "果樹園での収穫クエスト", "田植えクエスト"],
+    "祭事": ["地域祭りクエスト", "伝統行事クエスト", "神輿担ぎクエスト"],
+    "漁業": ["朝市での魚の仕分けクエスト", "定置網漁クエスト", "養殖場クエスト"],
+    "林業": ["伐採クエスト"],
   };
 
   const categoryTitles = titles[category] || titles["伝統工芸"];
@@ -201,8 +235,7 @@ function generateDescription(category: string): string {
     "農業": ["自然と触れ合いながら、持続可能な農業を体験できます。"],
     "祭事": ["地域の伝統行事の裏側を知り、文化継承に貢献できます。"],
     "漁業": ["海の恵みを直接体験し、漁業の現場を知ることができます。"],
-    "介護": ["プロの介護士から指導を受けながら、介護の基礎を学べます。"],
-    "保育": ["子どもたちと触れ合いながら、保育の現場を体験できます。"]
+    "林業": ["自然の恵みを直接体験し、林業の現場を知ることができます。"]
   };
 
   return descriptions[category]?.[0] || "貴重な体験ができます。";
@@ -214,8 +247,7 @@ function generateComment(category: string): string {
     "農業": ["自然の中での作業は心が癒されました。"],
     "祭事": ["地域の伝統を守る大切さを学びました。"],
     "漁業": ["漁師さんの仕事の大変さを知りました。"],
-    "介護": ["利用者さんとの交流がとても心温まりました。"],
-    "保育": ["子どもたちの笑顔に元気をもらいました。"]
+    "林業": ["伐採作業の大変さを知りました。"]
   };
 
   return comments[category]?.[0] || "とても良い経験になりました。";
@@ -223,12 +255,11 @@ function generateComment(category: string): string {
 
 function getImageForCategory(category: string): string {
   const images: Record<string, string> = {
-    "伝統工芸": "https://images.unsplash.com/photo-1590794056226-79ef3a8147e1",
-    "農業": "https://images.unsplash.com/photo-1523348837708-15d4a09cfac2",
-    "祭事": "https://images.unsplash.com/photo-1528372444006-1bfc81acab02",
-    "漁業": "https://images.unsplash.com/photo-1507699622108-4be3abd695ad",
-    "介護": "https://images.unsplash.com/photo-1576765608535-5f04d1e3f289",
-    "保育": "https://images.unsplash.com/photo-1526634332515-d56c5fd16991"
+    "伝統工芸": getQuestImagePath('伝統工芸品.png'),
+    "農業": getQuestImagePath('収穫.png'),
+    "祭事": getQuestImagePath('お祭り.png'),
+    "漁業": getQuestImagePath('漁業.png'),
+    "林業": getQuestImagePath('林業.png'),
   };
 
   return images[category] || images["伝統工芸"];
@@ -240,8 +271,7 @@ function generateRewardCardName(category: string, index: number): string {
     "農業": ["大地の守り手", "収穫の喜び", "自然との対話"],
     "祭事": ["祭りの継承者", "伝統の守り手", "祭魂"],
     "漁業": ["海の恵み", "漁師の誇り", "豊漁の証"],
-    "介護": ["思いやりの心", "癒しの手", "介護の心"],
-    "保育": ["子どもの笑顔", "未来の種", "保育の心"]
+    "林業": ["林の恵み", "大自然の息吹"],
   };
 
   const names = cardNames[category] || cardNames["伝統工芸"];

@@ -32,10 +32,8 @@ export function BottomNavigation({ onFavoritesToggle, showFavorites }: BottomNav
           <span className="text-xs">QUEST</span>
         </button>
         <button 
-          className={`flex flex-col items-center space-y-1 transition-colors ${
-            showFavorites ? 'text-[#E8D4B9]' : 'text-[#E8D4B9]/50 hover:text-[#E8D4B9]'
-          }`}
-          onClick={() => onFavoritesToggle(!showFavorites)}
+          className="flex flex-col items-center space-y-1 text-[#E8D4B9]/50 hover:text-[#E8D4B9] transition-colors"
+          onClick={() => router.push('/favorites')}
         >
           <Heart className={`w-6 h-6 ${showFavorites ? 'fill-current' : ''}`} />
           <span className="text-xs">おきにいり</span>
@@ -49,7 +47,7 @@ export function BottomNavigation({ onFavoritesToggle, showFavorites }: BottomNav
         </button>
         <button 
           className="flex flex-col items-center space-y-1 text-[#E8D4B9]/50 hover:text-[#E8D4B9] transition-colors"
-          onClick={() => router.push('/messages')}
+          onClick={() => router.push('/cards')}
         >
           <CreditCard className="w-6 h-6" />
           <span className="text-xs">カード</span>
