@@ -32,3 +32,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# 画像ファイルのみ無視
+/quests/お祭り.png
+/quests/漁業.png
+/quests/収穫.png
+/quests/竹細工.png
+/quests/伝統工芸品.png
+/quests/林業.png

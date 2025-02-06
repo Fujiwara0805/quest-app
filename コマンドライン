@@ -1,0 +1,2 @@
+git rm -r --cached quests/
+git commit -m "questsディレクトリを.gitignoreに追加したため、追跡対象から外す"
