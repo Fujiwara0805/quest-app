@@ -9,4 +9,5 @@ declare module 'react-day-picker';
 declare module 'embla-carousel-react';
 
 // 既存の宣言の下部に以下を追加
-declare module 'cmdk'; 
+declare module 'cmdk';
+declare module '@radix-ui/react-context-menu'; 
