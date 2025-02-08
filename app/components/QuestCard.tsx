@@ -3,7 +3,6 @@
 import { memo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
-import { Clock, MapPin, Users, Trophy, Star } from 'lucide-react';
 import { Quest } from '@/types/quest';
 import { FavoriteButton } from './FavoriteButton';
 
@@ -65,7 +64,6 @@ export const QuestCard = memo(function QuestCard({ quest }: QuestCardProps) {
 
           <div>
             <div className="flex items-center mb-2 bg-black/60 backdrop-blur-sm px-2 py-1 rounded-md w-fit">
-              <Star className={`w-4 h-4 ${getRatingColor(quest.reviews.rating)} fill-current`} />
               <span className="ml-1 text-sm font-medium">{quest.reviews.rating.toFixed(1)}</span>
               <span className="ml-1 text-xs text-white/60">({quest.reviews.count}件)</span>
             </div>
@@ -79,11 +77,9 @@ export const QuestCard = memo(function QuestCard({ quest }: QuestCardProps) {
       <CardContent className="p-4 space-y-4">
         <div className="space-y-2 text-white/90 bg-[#3a2820]/30 p-3 rounded-lg">
           <div className="flex items-center">
-            <MapPin className="w-4 h-4 mr-2 flex-shrink-0 text-white/80" />
             <span className="text-sm font-medium">{quest.location.address}</span>
           </div>
           <div className="flex items-center">
-            <Clock className="w-4 h-4 mr-2 flex-shrink-0 text-white/80" />
             <span className="text-sm font-medium">
               {new Date(quest.date).toLocaleDateString('ja-JP', { 
                 year: 'numeric',

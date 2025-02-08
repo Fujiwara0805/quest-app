@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Share2, Clock, MapPin, Users, Trophy, Star } from 'lucide-react';
+import { Clock, MapPin, Users, Trophy, Star } from 'lucide-react';
+import { Share2 } from 'lucide-react';
 import { Quest } from '@/types/quest';
 import { FavoriteButton } from '@/components/FavoriteButton';
 
