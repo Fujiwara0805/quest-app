@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { Clock, ChevronDown } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,7 +34,6 @@ export function SortHeader({ onSortChange, currentSort }: SortHeaderProps) {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button className="flex items-center space-x-2">
-              <Clock className="w-5 h-5" />
               <span>{SORT_OPTIONS[currentSort]}</span>
               <ChevronDown className="w-5 h-5" />
             </Button>

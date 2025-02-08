@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, usePathname } from 'next/navigation';
-import { Heart, Calendar, CreditCard, User, Sword } from 'lucide-react';
+import { Heart, Calendar, Sword } from 'lucide-react';
 
 export function MainNav() {
   const router = useRouter();

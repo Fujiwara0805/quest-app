@@ -6,4 +6,7 @@ declare module '@radix-ui/react-avatar';
 declare module 'react-day-picker';
 
 // embla-carousel-react の型定義が存在しない場合に備えて、モジュール宣言を追加
-declare module 'embla-carousel-react'; 
+declare module 'embla-carousel-react';
+
+// 既存の宣言の下部に以下を追加
+declare module 'cmdk'; 
