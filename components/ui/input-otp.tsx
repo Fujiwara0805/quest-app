@@ -34,7 +34,9 @@ const InputOTPSlot = React.forwardRef<
   React.ElementRef<'div'>,
   React.ComponentPropsWithoutRef<'div'> & { index: number }
 >(({ index, className, ...props }, ref) => {
-  const inputOTPContext = React.useContext(OTPInputContext);
+  const inputOTPContext = React.useContext(OTPInputContext) as 
+    | { slots: { char: string; hasFakeCaret: boolean; isActive: boolean }[] }
+    | null;
   if (!inputOTPContext) {
     throw new Error('InputOTPContextが提供されていません。InputOTPGroup内で使用してください。');
   }
