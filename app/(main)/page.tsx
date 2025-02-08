@@ -3,34 +3,23 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { DateSelector } from '@/components/DateSelector';
-import { LocationSelector } from '../components/LocationSelector';
-import { QuestList } from '../components/QuestList';
+import { LocationSelector } from '@/components/LocationSelector';
+import { QuestList } from '@/components/QuestList';
 import { useQuests } from '@/lib/hooks/useQuests';
 import { useLocation } from '@/lib/hooks/useLocation';
 
 export default function QuestListPage() {
   const searchParams = useSearchParams();
   const { selectedPrefecture, setSelectedPrefecture } = useLocation("大分県");
-  const {
-    quests,
-    selectedDate,
-    setSelectedDate,
-    sortType,
-    setSortType
-  } = useQuests(new Date());
+  const { quests, selectedDate, setSelectedDate, sortType, setSortType } = useQuests(new Date());
 
-  // 検索関連の状態
   const [searchQuery, setSearchQuery] = useState('');
   const [dateSearchEnabled, setDateSearchEnabled] = useState(true);
   const [showFavorites, setShowFavorites] = useState(false);
 
-  // クエストのフィルタリング
   const filteredQuests = quests
     .filter(quest => {
-      if (showFavorites) {
-        return false; // お気に入り画面に移動するため、ここでは表示しない
-      }
-
+      if (showFavorites) return false;
       if (dateSearchEnabled) {
         const questDate = quest.date;
         return (
@@ -53,7 +42,6 @@ export default function QuestListPage() {
       return true;
     });
 
-  // URLパラメータの処理
   useEffect(() => {
     const dateParam = searchParams.get('date');
     if (dateParam === 'today') {
@@ -81,7 +69,6 @@ export default function QuestListPage() {
           />
         )}
       </div>
-
       <main className="pb-24">
         <QuestList quests={filteredQuests} />
       </main>

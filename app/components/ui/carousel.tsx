@@ -12,4 +12,4 @@ type UseCarouselParameters = Parameters<typeof useEmblaCarousel>;
 type CarouselOptions = UseCarouselParameters[0];
 type CarouselPlugin = UseCarouselParameters[1];
 
-// 以下、残りのコード...
+// Carouselコンポーネントの実装（以下に実際のコードを記述）
