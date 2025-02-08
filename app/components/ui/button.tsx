@@ -29,3 +29,15 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 Button.displayName = "Button";
 
 export { Button };
+
+export const buttonVariants = (props?: { variant?: string }) => {
+  // 例として、variantに応じたTailwindCSSのクラス文字列を返す実装
+  switch (props?.variant) {
+    case 'outline':
+      return 'px-4 py-2 border rounded-md hover:bg-gray-100';
+    case 'ghost':
+      return 'px-4 py-2 bg-transparent hover:bg-gray-100';
+    default:
+      return 'px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700';
+  }
+};
