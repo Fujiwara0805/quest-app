@@ -17,4 +17,5 @@ declare module '@radix-ui/react-menubar';
 declare module '@radix-ui/react-navigation-menu';
 declare module '@radix-ui/react-popover';
 declare module '@radix-ui/react-progress';
-declare module '@radix-ui/react-radio-group'; 
+declare module '@radix-ui/react-radio-group';
+declare module 'react-resizable-panels'; 
