@@ -13,4 +13,5 @@ declare module 'cmdk';
 declare module '@radix-ui/react-context-menu';
 declare module 'vaul';
 declare module 'input-otp';
-declare module '@radix-ui/react-menubar'; 
+declare module '@radix-ui/react-menubar';
+declare module '@radix-ui/react-navigation-menu'; 
