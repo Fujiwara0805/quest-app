@@ -1,3 +1,5 @@
+"use client";
+
 // 以前は「use client」ディレクティブが記述されていたかもしれませんが、サーバーコンポーネントとして扱うために削除します。
 
 import React, { Suspense } from "react";
