@@ -1,3 +1,6 @@
+"use client";
+
+import React, { Suspense } from 'react';
 import { DUMMY_QUESTS } from "@/data/quests";
 import { PaymentForm } from "./components/PaymentForm";
 
@@ -13,5 +16,9 @@ export function generateStaticParams() {
 }
 
 export default function PaymentPage({ params }: { params: { questId: string } }) {
-  return <PaymentForm questId={params.questId} />;
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PaymentForm questId={params.questId} />
+    </Suspense>
+  );
 }
