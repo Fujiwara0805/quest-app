@@ -19,4 +19,5 @@ declare module '@radix-ui/react-popover';
 declare module '@radix-ui/react-progress';
 declare module '@radix-ui/react-radio-group';
 declare module 'react-resizable-panels';
-declare module '@radix-ui/react-separator'; 
+declare module '@radix-ui/react-separator';
+declare module '@radix-ui/react-slider'; 
