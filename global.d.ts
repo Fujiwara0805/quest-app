@@ -12,4 +12,5 @@ declare module 'embla-carousel-react';
 declare module 'cmdk';
 declare module '@radix-ui/react-context-menu';
 declare module 'vaul';
-declare module 'input-otp'; 
+declare module 'input-otp';
+declare module '@radix-ui/react-menubar'; 
