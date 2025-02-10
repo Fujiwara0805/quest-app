@@ -1,4 +1,4 @@
-"use client";
+// "use client"; // この行を削除して、サーバーコンポーネントとして扱います。
 
 import React, { Suspense } from 'react';
 import { DUMMY_QUESTS } from "@/data/quests";
