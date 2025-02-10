@@ -24,4 +24,5 @@ declare module '@radix-ui/react-slider';
 declare module 'next-themes';
 declare module 'sonner';
 declare module '@radix-ui/react-toast';
-declare module '@radix-ui/react-toggle-group'; 
+declare module '@radix-ui/react-toggle-group';
+declare module '@radix-ui/react-tooltip'; 
