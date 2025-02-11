@@ -19,7 +19,7 @@ export function useCards() {
         name: isAcquired ? '竹職人の誇り' : '????',
         image: isAcquired 
           ? `/images/cards/${numStr}.png`
-          : `https://images.unsplash.com/photo-1597589827317-4c6d6e0a90bd`,
+          : 'https://images.unsplash.com/photo-1597589827317-4c6d6e0a90bd',
         description: isAcquired 
           ? '伝統ある別府竹細工の技を継承する職人の誇りと技術を表現したカード。竹細工の繊細な美しさと職人の情熱が込められている。' 
           : 'このカードの情報は未解放です。クエストをクリアしてカードを獲得しましょう。',
