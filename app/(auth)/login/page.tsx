@@ -11,7 +11,7 @@ export default function LoginPage() {
   const handleLogin = async (userType: 'user' | 'master') => {
     try {
       setError("");
-      router.push(userType === 'user' ? '/' : '/admin');
+      router.push(userType === 'user' ? '/' : '/admin/create-quest');
     } catch (error: any) {
       setError("ログインに失敗しました。");
     }

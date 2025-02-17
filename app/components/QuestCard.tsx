@@ -1,18 +1,18 @@
 "use client";
 
-import { memo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
-import { Quest } from '@/types/quest';
-import { FavoriteButton } from './FavoriteButton';
+import type { Quest } from '@/types/quest';
+import { FavoriteButton } from '@/components/FavoriteButton';
 
 interface QuestCardProps {
   quest: Quest;
 }
 
-export const QuestCard = memo(function QuestCard({ quest }: QuestCardProps) {
+export function QuestCard({ quest }: QuestCardProps) {
   const router = useRouter();
 
+  // カードクリック時の処理
   const handleCardClick = () => {
     router.push(`/${quest.id}`);
   };
@@ -126,4 +126,4 @@ export const QuestCard = memo(function QuestCard({ quest }: QuestCardProps) {
       </CardContent>
     </Card>
   );
-});
+} 
