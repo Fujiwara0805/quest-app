@@ -10,8 +10,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'QUEST - 地域特化型人材マッチングプラットフォーム',
-  description: '地域の人材と仕事をつなぐ、新しいマッチングプラットフォーム',
+  title: 'QUEST',
+  description: 'あなたの冒険が地域を変える',
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
 };
 
