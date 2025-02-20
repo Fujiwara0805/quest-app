@@ -79,7 +79,7 @@ export function LoginForm({ onLogin, error }: LoginFormProps) {
               </div>
               {error && <p className="text-sm text-red-500">{error}</p>}
               <Button 
-                className="w-full bg-purple-600 hover:bg-purple-700 text-white transition-colors"
+                className="w-full bg-white text-purple-600 border-2 border-purple-600 font-medium hover:bg-purple-600 hover:text-white"
                 type="submit" 
                 disabled={loading}
               >
@@ -115,7 +115,7 @@ export function LoginForm({ onLogin, error }: LoginFormProps) {
               </div>
               {error && <p className="text-sm text-red-500">{error}</p>}
               <Button 
-                className="w-full bg-purple-600 hover:bg-purple-700 text-white transition-colors"
+                className="w-full bg-white text-purple-600 border-2 border-purple-600 font-medium hover:bg-purple-600 hover:text-white"
                 type="submit" 
                 disabled={loading}
               >
@@ -130,7 +130,7 @@ export function LoginForm({ onLogin, error }: LoginFormProps) {
           アカウントをお持ちでない方は
         </p>
         <Button
-          className="w-full border-2 border-purple-600 text-purple-600 hover:bg-purple-50 font-medium"
+          className="w-full bg-white text-purple-600 border-2 border-purple-600 font-medium hover:bg-purple-600 hover:text-white"
           onClick={() => window.location.href = '/signup'}
         >
           新規登録はこちら
