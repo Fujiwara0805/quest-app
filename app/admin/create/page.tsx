@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
+import { PageHeader } from '@/app/(main)/components/page-header';
 
 export default function CreateQuestPage() {
   const router = useRouter();
@@ -28,8 +29,9 @@ export default function CreateQuestPage() {
   };
 
   return (
+  <>
+  <PageHeader title="クエスト作成画面" />
     <div className="max-w-3xl mx-auto p-4">
-      <h2 className="text-2xl font-bold my-4 text-white">クエスト作成</h2>
       <Card className="bg-[#463C2D]/80 backdrop-blur rounded-lg p-6 space-y-6 shadow-xl border border-[#C0A172]">
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -39,6 +41,7 @@ export default function CreateQuestPage() {
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
+                placeholder="クエストのタイトルを入力"
                 className="w-full bg-[#3a2820] border border-[#C0A172] p-2 rounded-md text-white placeholder:text-gray-400"
                 required
               />
@@ -48,7 +51,8 @@ export default function CreateQuestPage() {
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full bg-[#3a2820] border border-[#C0A172] p-2 rounded-md text-white placeholder:text-gray-400"
+                placeholder="クエストの詳細を記入"
+                className="w-full bg-[#3a2820] border border-[#C0A172] p-2 rounded-md text-white placeholder:text-gray-400 min-h-[100px]"
                 required
               />
             </div>
@@ -93,6 +97,7 @@ export default function CreateQuestPage() {
                 type="text"
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
+                placeholder="住所を入力"
                 className="w-full bg-[#3a2820] border border-[#C0A172] p-2 rounded-md text-white placeholder:text-gray-400"
                 required
               />
@@ -103,6 +108,7 @@ export default function CreateQuestPage() {
                 type="text"
                 value={access}
                 onChange={(e) => setAccess(e.target.value)}
+                placeholder="最寄り駅やアクセス方法"
                 className="w-full bg-[#3a2820] border border-[#C0A172] p-2 rounded-md text-white placeholder:text-gray-400"
                 required
               />
@@ -114,6 +120,7 @@ export default function CreateQuestPage() {
                   type="number"
                   value={ticketsAvailable}
                   onChange={(e) => setTicketsAvailable(e.target.value)}
+                  placeholder="在庫数"
                   className="w-full bg-[#3a2820] border border-[#C0A172] p-2 rounded-md text-white"
                   required
                 />
@@ -124,6 +131,7 @@ export default function CreateQuestPage() {
                   type="number"
                   value={ticketPrice}
                   onChange={(e) => setTicketPrice(e.target.value)}
+                  placeholder="価格"
                   className="w-full bg-[#3a2820] border border-[#C0A172] p-2 rounded-md text-white"
                   required
                 />
@@ -139,7 +147,9 @@ export default function CreateQuestPage() {
                     setImage(e.target.files[0]);
                   }
                 }}
-                className="w-full bg-[#3a2820] border border-[#C0A172] p-2 rounded-md text-white file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-white file:bg-purple-600 file:hover:bg-purple-700"
+                className="w-full bg-[#3a2820] border border-[#C0A172] p-2 rounded-md text-white
+                           file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0
+                           file:text-white file:bg-purple-600 file:hover:bg-purple-700"
                 required
               />
             </div>
@@ -150,6 +160,7 @@ export default function CreateQuestPage() {
                   type="text"
                   value={rewardCardNumber}
                   onChange={(e) => setRewardCardNumber(e.target.value)}
+                  placeholder="例: No.001"
                   className="w-full bg-[#3a2820] border border-[#C0A172] p-2 rounded-md text-white placeholder:text-gray-400"
                   required
                 />
@@ -160,6 +171,7 @@ export default function CreateQuestPage() {
                   type="text"
                   value={rewardCardName}
                   onChange={(e) => setRewardCardName(e.target.value)}
+                  placeholder="カード名を入力"
                   className="w-full bg-[#3a2820] border border-[#C0A172] p-2 rounded-md text-white placeholder:text-gray-400"
                   required
                 />
@@ -175,5 +187,6 @@ export default function CreateQuestPage() {
         </CardContent>
       </Card>
     </div>
+    </>
   );
 }
