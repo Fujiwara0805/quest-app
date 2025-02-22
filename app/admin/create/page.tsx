@@ -26,50 +26,61 @@ export default function CreateQuestPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
-    let image_url = "";
-    if (image) {
-      const fileExt = image.name.split('.').pop();
-      const fileName = `${Math.random()}.${fileExt}`;
-      const { data: uploadData, error: uploadError } = await supabase
-        .storage
-        .from('quests-images')
-        .upload(fileName, image);
-      if (uploadError) {
-        console.error("画像アップロードエラー:", uploadError);
-        return;
-      }
-      const { data: { publicUrl } } = supabase
-        .storage
-        .from('quests-images')
-        .getPublicUrl(uploadData.path);
-      image_url = publicUrl;
-    }
-    
-    const { data, error } = await supabase
-      .from('quests')
-      .insert([
-        {
-          title,
-          description,
-          date,
-          start_time: startTime,
-          difficulty,
-          address,
-          access,
-          tickets_available: parseInt(ticketsAvailable, 10),
-          ticket_price: parseFloat(ticketPrice),
-          image_url,
-          reward_card_number: rewardCardNumber,
-          reward_card_name: rewardCardName,
+    try {
+      let image_url = "";
+      if (image) {
+        const fileExt = image.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+
+        const { data: uploadData, error: uploadError } = await supabase
+          .storage
+          .from('quest-images')
+          .upload(`public/${fileName}`, image, {
+            cacheControl: '3600',
+            upsert: false
+          });
+
+        if (uploadError) {
+          console.error("画像アップロードエラー:", uploadError);
+          return;
         }
-      ]);
+
+        const { data } = supabase
+          .storage
+          .from('quest-images')
+          .getPublicUrl(`public/${fileName}`);
+        
+        image_url = data.publicUrl;
+      }
       
-    if (error) {
-      console.error("データ挿入エラー:", error);
-      return;
+      const { error: insertError } = await supabase
+        .from('quests')
+        .insert([
+          {
+            title,
+            description,
+            date,
+            start_time: startTime,
+            difficulty,
+            address,
+            access,
+            tickets_available: parseInt(ticketsAvailable, 10),
+            ticket_price: parseFloat(ticketPrice),
+            image_url,
+            reward_card_number: rewardCardNumber,
+            reward_card_name: rewardCardName,
+          }
+        ]);
+        
+      if (insertError) {
+        throw new Error("データ挿入エラー: " + insertError.message);
+      }
+      
+      router.push("/admin/create/complete");
+      
+    } catch (error) {
+      console.error("エラーが発生しました:", error);
     }
-    
-    router.push("/");
   };
 
   return (
