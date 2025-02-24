@@ -22,7 +22,7 @@
       "@/*": ["./*"],
       "@/components/*": ["./app/components/*"],
       "@/lib/*": ["./app/lib/*"],
-      "@/types/*": ["./app/types/*"],
+      "@/types/*": ["./types/*"],
       "@/data/*": ["./app/data/*"]
     },
     "baseUrl": "."

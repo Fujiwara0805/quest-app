@@ -4,11 +4,11 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import { PageHeader } from '@/app/(main)/components/page-header';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createClient } from '@/utils/supabase/client';
 
 export default function CreateQuestPage() {
   const router = useRouter();
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -30,25 +30,19 @@ export default function CreateQuestPage() {
       let image_url = "";
       if (image) {
         const fileExt = image.name.split('.').pop();
-        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+        const fileName = `${Date.now()}.${fileExt}`;
 
         const { data: uploadData, error: uploadError } = await supabase
           .storage
-          .from('quest-images')
-          .upload(`public/${fileName}`, image, {
-            cacheControl: '3600',
-            upsert: false
-          });
+          .from('quests')
+          .upload(fileName, image);
 
-        if (uploadError) {
-          console.error("画像アップロードエラー:", uploadError);
-          return;
-        }
+        if (uploadError) throw uploadError;
 
         const { data } = supabase
           .storage
-          .from('quest-images')
-          .getPublicUrl(`public/${fileName}`);
+          .from('quests')
+          .getPublicUrl(fileName);
         
         image_url = data.publicUrl;
       }
@@ -72,9 +66,7 @@ export default function CreateQuestPage() {
           }
         ]);
         
-      if (insertError) {
-        throw new Error("データ挿入エラー: " + insertError.message);
-      }
+      if (insertError) throw insertError;
       
       router.push("/admin/create/complete");
       
