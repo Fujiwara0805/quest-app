@@ -26,6 +26,18 @@ export default function CreateQuestPage() {
     e.preventDefault();
     
     try {
+      // 接続確認
+      const { data: connectionTest, error: connectionError } = await supabase
+        .from('quests')
+        .select('id')
+        .limit(1);
+
+      if (connectionError) {
+        throw new Error(`データベース接続エラー: ${connectionError.message}`);
+      }
+
+      console.log('データベース接続成功:', connectionTest);
+      
       let image_url = "";
       if (image) {
         const fileExt = image.name.split('.').pop();
@@ -33,20 +45,21 @@ export default function CreateQuestPage() {
 
         const { data: uploadData, error: uploadError } = await supabase
           .storage
-          .from('quests')
+          .from('quests-media')
           .upload(fileName, image);
 
         if (uploadError) throw uploadError;
 
         const { data } = supabase
           .storage
-          .from('quests')
+          .from('quests-media')
           .getPublicUrl(fileName);
         
         image_url = data.publicUrl;
       }
       
-      const { error: insertError } = await supabase
+      // データ挿入部分の修正
+      const { data: insertData, error: insertError } = await supabase
         .from('quests')
         .insert([
           {
@@ -63,14 +76,22 @@ export default function CreateQuestPage() {
             reward_card_number: rewardCardNumber,
             reward_card_name: rewardCardName,
           }
-        ]);
+        ])
+        .select(); // 挿入後のデータを返す
         
-      if (insertError) throw insertError;
+      if (insertError) {
+        throw new Error(`データ挿入エラー: ${insertError.message}, コード: ${insertError.code}`);
+      }
       
+      console.log('クエスト作成成功:', insertData);
       router.push("/admin/create/complete");
       
-    } catch (error) {
-      console.error("エラーが発生しました:", error);
+    } catch (error: any) {
+      console.error("クエスト作成エラー:", error);
+      if (error.message) {
+        console.error("エラーメッセージ:", error.message);
+      }
+      alert(`エラーが発生しました: ${error.message || 'Unknown error'}`);
     }
   };
 

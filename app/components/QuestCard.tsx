@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
-import type { Quest } from '@/types/quest';
+import type { Quest } from '@/app/types/quest';
 import { FavoriteButton } from '@/components/FavoriteButton';
 
 interface QuestCardProps {
