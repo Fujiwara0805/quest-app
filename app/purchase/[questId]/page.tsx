@@ -1,22 +1,30 @@
-import { DUMMY_QUESTS } from "@/data/quests";
+import { getQuests } from "@/app/data/quests";
 import { PurchaseForm } from "./components/PurchaseForm";
+import { Quest } from "@/app/types/quest";
 
 // 静的パスを生成する関数
-export function generateStaticParams() {
-  const questIds = Object.values(DUMMY_QUESTS)
-    .flat()
-    .map(quest => ({
+export async function generateStaticParams() {
+  try {
+    const quests = await getQuests();
+    return quests.map(quest => ({
       questId: quest.id
     }));
-  
-  return questIds;
+  } catch (error) {
+    console.error('静的パス生成エラー:', error);
+    return [];
+  }
 }
 
-export default function PurchasePage({ params }: { params: { questId: string } }) {
+export default async function PurchasePage({ params }: { params: { questId: string } }) {
   // クエストデータを取得
-  const quest = Object.values(DUMMY_QUESTS)
-    .flat()
-    .find(q => q.id === params.questId);
+  let quest: Quest | undefined;
+  
+  try {
+    const quests = await getQuests();
+    quest = quests.find(q => q.id === params.questId);
+  } catch (error) {
+    console.error('クエスト取得エラー:', error);
+  }
 
   if (!quest) {
     return (

@@ -4,23 +4,58 @@ import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { DateSelector } from './DateSelector';
 import { LocationSelector } from './LocationSelector';
-import { QuestList } from './QuestList';
 import { BottomNavigation } from './BottomNavigation';
 import { useQuests } from '../lib/hooks/useQuests';
 import { useLocation } from '../lib/hooks/useLocation';
 import { useFavorites } from '../lib/hooks/useFavorites';
+import QuestList from './QuestList';
+import { SortType } from '@/app/lib/constants/sort-options';
 
 export default function QuestListContainer() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { selectedPrefecture, setSelectedPrefecture } = useLocation("大分県");
   const { favorites } = useFavorites();
-  const { quests, selectedDate, setSelectedDate, sortType, setSortType } = useQuests(new Date());
+  const { quests, selectedDate, setSelectedDate, sortType, setSortType, isLoading, error } = useQuests(new Date());
   
   // 検索関連の状態
   const [searchQuery, setSearchQuery] = useState('');
   const [dateSearchEnabled, setDateSearchEnabled] = useState(true);
   const [showFavorites, setShowFavorites] = useState(false);
+
+  // URLパラメータの処理
+  useEffect(() => {
+    const dateParam = searchParams.get('date');
+    const favoritesParam = searchParams.get('favorites');
+
+    if (dateParam === 'today') {
+      setSelectedDate(new Date());
+    }
+
+    if (favoritesParam === 'true') {
+      setShowFavorites(true);
+    } else {
+      setShowFavorites(false);
+    }
+  }, [searchParams, setSelectedDate]);
+
+  // ローディング状態の表示
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[url('/images/background.png')] bg-cover bg-center flex items-center justify-center">
+        <div className="text-white text-xl">読み込み中...</div>
+      </div>
+    );
+  }
+
+  // エラー状態の表示
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[url('/images/background.png')] bg-cover bg-center flex items-center justify-center">
+        <div className="text-white text-xl">エラーが発生しました: {error.message}</div>
+      </div>
+    );
+  }
 
   // クエストのフィルタリング
   const filteredQuests = quests
@@ -32,6 +67,9 @@ export default function QuestListContainer() {
       // 日付検索が有効な場合のみ日付でフィルタリング
       if (dateSearchEnabled) {
         const questDate = quest.date;
+        if (!questDate || !(questDate instanceof Date) || isNaN(questDate.getTime())) {
+          return false;
+        }
         return (
           questDate.getDate() === selectedDate.getDate() &&
           questDate.getMonth() === selectedDate.getMonth() &&
@@ -53,34 +91,18 @@ export default function QuestListContainer() {
       return true;
     });
 
-  // URLパラメータの処理
-  useEffect(() => {
-    const dateParam = searchParams.get('date');
-    const favoritesParam = searchParams.get('favorites');
-
-    if (dateParam === 'today') {
-      setSelectedDate(new Date());
-    }
-
-    if (favoritesParam === 'true') {
-      setShowFavorites(true);
-    } else {
-      setShowFavorites(false);
-    }
-  }, [searchParams, setSelectedDate]);
-
   return (
     <div className="min-h-screen bg-[url('/images/background.png')] bg-cover bg-center">
       <div className="min-h-screen bg-gradient-to-b from-black/30 via-black/20 to-black/40">
         {/* 装飾的な要素 */}
-        <div className="absolute inset-0 bg-[url('/patterns/noise.png')] opacity-5 pointer-events-none" />
+        <div className="absolute inset-0 bg-[url('/images/noise.png')] opacity-5 pointer-events-none" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#2a1810]/40 to-transparent pointer-events-none" />
         
         <div className="sticky top-0 z-50">
           <LocationSelector
             selectedPrefecture={selectedPrefecture}
             onPrefectureSelect={setSelectedPrefecture}
-            currentSort={sortType}
+            currentSort={sortType as SortType}
             onSortChange={setSortType}
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
@@ -93,7 +115,13 @@ export default function QuestListContainer() {
         </div>
         
         <main className="pb-24">
-          <QuestList quests={filteredQuests} />
+          {filteredQuests.length === 0 ? (
+            <div className="text-center py-10 text-white">
+              クエストが見つかりませんでした
+            </div>
+          ) : (
+            <QuestList quests={filteredQuests} />
+          )}
         </main>
         
         <div className="fixed bottom-0 left-0 right-0 z-50">

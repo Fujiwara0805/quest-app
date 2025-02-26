@@ -1,18 +1,20 @@
 // "use client"; // この行を削除して、サーバーコンポーネントとして扱います。
 
 import React, { Suspense } from 'react';
-import { DUMMY_QUESTS } from "@/data/quests";
+import { getQuests } from "@/app/data/quests";
 import { PaymentForm } from "./components/PaymentForm";
 
 // 静的パスを生成する関数
-export function generateStaticParams() {
-  const questIds = Object.values(DUMMY_QUESTS)
-    .flat()
-    .map(quest => ({
+export async function generateStaticParams() {
+  try {
+    const quests = await getQuests();
+    return quests.map(quest => ({
       questId: quest.id
     }));
-  
-  return questIds;
+  } catch (error) {
+    console.error('静的パス生成エラー:', error);
+    return [];
+  }
 }
 
 export default function PaymentPage({ params }: { params: { questId: string } }) {

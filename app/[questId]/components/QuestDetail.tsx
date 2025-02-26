@@ -1,10 +1,9 @@
 "use client";
 
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Clock, MapPin, Users, Trophy, Star } from 'lucide-react';
 import { Share2 } from 'lucide-react';
-import { Quest } from '@/types/quest';
+import { Quest } from '@/app/types/quest';
 import { FavoriteButton } from '@/components/FavoriteButton';
 
 interface QuestDetailProps {
@@ -160,13 +159,13 @@ export function QuestDetail({ quest }: QuestDetailProps) {
               <h2 className="text-lg font-medium text-[#E8D4B9] mb-3">レビュー</h2>
               <div className="space-y-4">
                 <div className="flex items-center">
-                  <Star className={`w-5 h-5 ${getRatingColor(quest.reviews.rating)} fill-current`} />
-                  <span className={`font-medium ml-2 ${getRatingColor(quest.reviews.rating)}`}>
-                    {quest.reviews.rating.toFixed(1)}
+                  <Star className={`w-5 h-5 ${getRatingColor(quest.reviews?.rating || 0)} fill-current`} />
+                  <span className={`font-medium ml-2 ${getRatingColor(quest.reviews?.rating || 0)}`}>
+                    {(quest.reviews?.rating || 0).toFixed(1)}
                   </span>
-                  <span className="text-[#E8D4B9]/60 ml-2">({quest.reviews.count}件)</span>
+                  <span className="text-[#E8D4B9]/60 ml-2">({quest.reviews?.count || 0}件)</span>
                 </div>
-                {quest.reviews.comments.map((comment) => (
+                {quest.reviews?.comments?.map((comment) => (
                   <div key={comment.id} className="bg-[#5C4D3C]/50 rounded-lg p-4 border border-[#C0A172]">
                     <div className="flex justify-between items-start mb-2">
                       <div>

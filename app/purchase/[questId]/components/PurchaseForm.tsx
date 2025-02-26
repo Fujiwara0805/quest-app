@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft } from 'lucide-react';
-import { Quest } from "@/types/quest";
+import { Quest } from "@/app/types/quest";
 import { Label } from "@/components/ui/label";
 import {
   Select,
