@@ -50,12 +50,8 @@ export default function CreateQuestPage() {
 
         if (uploadError) throw uploadError;
 
-        const { data } = supabase
-          .storage
-          .from('quests-media')
-          .getPublicUrl(fileName);
-        
-        image_url = data.publicUrl;
+        // ファイル名のみを保存する（URLではなく）
+        image_url = fileName;
       }
       
       // データ挿入部分の修正
