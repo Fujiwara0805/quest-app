@@ -1,57 +1,76 @@
 "use client";
 
-import { useState, useMemo, useCallback } from 'react';
-import { Quest } from '@/types/quest';
-import { DUMMY_QUESTS } from '@/data/quests';
-import { SortType } from '@/lib/constants/sort-options';
+import { useState, useEffect, useMemo } from 'react';
+import { getQuests } from '@/app/data/quests';
+import { Quest } from '@/app/types/quest';
 
 export function useQuests(initialDate: Date) {
-  const [selectedDate, setSelectedDate] = useState(initialDate);
-  const [sortType, setSortType] = useState<SortType>('nearDate');
+  const [selectedDate, setSelectedDate] = useState<Date>(initialDate);
+  const [sortType, setSortType] = useState<string>('date');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  const [allQuests, setAllQuests] = useState<Quest[]>([]);
 
-  const sortQuests = useCallback((quests: Quest[]) => {
-    return [...quests].sort((a, b) => {
-      switch (sortType) {
-        case 'nearDate':
-          // 開催日が近い順（現在日時との差が小さい順）
-          const now = new Date();
-          const diffA = Math.abs(a.date.getTime() - now.getTime());
-          const diffB = Math.abs(b.date.getTime() - now.getTime());
-          return diffA - diffB;
+  // Supabaseからデータを取得
+  useEffect(() => {
+    let isMounted = true; // コンポーネントがマウントされているかを追跡
+    
+    async function loadQuests() {
+      try {
+        setIsLoading(true);
+        const data = await getQuests();
         
-        case 'highPrice':
-          // チケット代金が高い順
-          return b.tickets.price - a.tickets.price;
-        
-        case 'lowPrice':
-          // チケット代金が少ない順
-          return a.tickets.price - b.tickets.price;
-        
-        case 'lowTickets':
-          // チケット残りが少ない順
-          return a.tickets.available - b.tickets.available;
-        
-        case 'difficulty':
-          // 難易度順（★の数で比較）
-          return b.difficulty.length - a.difficulty.length;
-        
-        default:
-          return 0;
+        // コンポーネントがまだマウントされている場合のみ状態を更新
+        if (isMounted) {
+          setAllQuests(data);
+        }
+      } catch (err) {
+        // コンポーネントがまだマウントされている場合のみ状態を更新
+        if (isMounted) {
+          console.error('クエスト取得エラー:', err);
+          setError(err instanceof Error ? err : new Error('クエスト取得中にエラーが発生しました'));
+        }
+      } finally {
+        // コンポーネントがまだマウントされている場合のみ状態を更新
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
-    });
-  }, [sortType]);
+    }
+    
+    loadQuests();
+    
+    // クリーンアップ関数
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
-  const quests = useMemo(() => {
-    // 全クエストを取得
-    const allQuests = Object.values(DUMMY_QUESTS).flat();
-    return sortQuests(allQuests);
-  }, [sortQuests]);
+  // クエストをソート
+  const sortedQuests = useMemo(() => {
+    if (!allQuests || allQuests.length === 0) {
+      return [];
+    }
+    
+    return [...allQuests].sort((a, b) => {
+      if (sortType === 'date') {
+        return a.date.getTime() - b.date.getTime();
+      } else if (sortType === 'price') {
+        return a.tickets.price - b.tickets.price;
+      } else if (sortType === 'rating') {
+        return (b.reviews?.rating || 0) - (a.reviews?.rating || 0);
+      }
+      return 0;
+    });
+  }, [allQuests, sortType]);
 
   return {
-    quests,
+    quests: sortedQuests,
     selectedDate,
     setSelectedDate,
     sortType,
-    setSortType
+    setSortType,
+    isLoading,
+    error
   };
 }

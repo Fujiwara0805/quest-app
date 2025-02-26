@@ -3,9 +3,10 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ChevronLeft, CreditCard, QrCode } from 'lucide-react';
-import { DUMMY_QUESTS } from "@/data/quests";
+import { Quest } from "@/app/types/quest";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { createClient } from '@/utils/supabase/client';
 
 interface PaymentFormProps {
   questId: string;
@@ -31,16 +32,68 @@ export function PaymentForm({ questId }: PaymentFormProps) {
     cvc: '',
     name: ''
   });
-
-  // クエストデータを取得
-  const quest = Object.values(DUMMY_QUESTS)
-    .flat()
-    .find(q => q.id === questId);
+  const [quest, setQuest] = useState<Quest | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   // URLパラメータから予約情報を取得
   const date = searchParams.get('date');
   const time = searchParams.get('time');
   const quantity = searchParams.get('quantity');
+
+  // クエストデータを取得
+  useEffect(() => {
+    async function fetchQuest() {
+      try {
+        const supabase = createClient();
+        const { data, error } = await supabase
+          .from('quests')
+          .select('*')
+          .eq('id', questId)
+          .single();
+          
+        if (error) {
+          throw error;
+        }
+        
+        if (data) {
+          // データベースから取得したデータをフロントエンドの型に変換
+          setQuest({
+            id: data.id.toString(),
+            title: data.title,
+            description: data.description,
+            difficulty: data.quest_difficulty || '★',
+            date: new Date(data.date),
+            startTime: data.start_time,
+            location: {
+              address: data.address,
+              access: data.access
+            },
+            tickets: {
+              available: data.tickets_available,
+              price: data.ticket_price
+            },
+            image: data.image_url,
+            reward: {
+              cardNumber: data.reward_card_number,
+              cardName: data.reward_card_name
+            },
+            reviews: {
+              rating: data.rating || 0,
+              count: data.review_count || 0,
+              comments: []
+            }
+          });
+        } else {
+          setError('クエストが見つかりませんでした');
+        }
+      } catch (error) {
+        console.error('クエスト取得エラー:', error);
+        setError('クエスト情報の取得に失敗しました');
+      }
+    }
+    
+    fetchQuest();
+  }, [questId]);
 
   // カード情報が全て入力されているかチェック
   const isCardInfoComplete = paymentMethod === 'qr' || (
@@ -52,19 +105,29 @@ export function PaymentForm({ questId }: PaymentFormProps) {
 
   // 予約情報がない場合は購入画面に戻る
   useEffect(() => {
-    if (!date || !time || !quantity || !quest) {
+    if (!date || !time || !quantity) {
       router.push(`/purchase/${questId}`);
     }
-  }, [date, time, quantity, quest, questId, router]);
+  }, [date, time, quantity, questId, router]);
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#3a2820]">
+        <div className="text-white text-center">
+          <h1 className="text-2xl font-bold mb-4">エラー: {error}</h1>
+          <a href="/" className="inline-block bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg">
+            クエスト一覧に戻る
+          </a>
+        </div>
+      </div>
+    );
+  }
 
   if (!quest) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#3a2820]">
         <div className="text-white text-center">
-          <h1 className="text-2xl font-bold mb-4">クエストが見つかりません</h1>
-          <a href="/" className="inline-block bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg">
-            クエスト一覧に戻る
-          </a>
+          <h1 className="text-2xl font-bold mb-4">読み込み中...</h1>
         </div>
       </div>
     );

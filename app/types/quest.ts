@@ -1,4 +1,4 @@
-export interface Quest {
+export type Quest = {
   id: string;
   title: string;
   description: string;
@@ -13,7 +13,7 @@ export interface Quest {
     available: number;
     price: number;
   };
-  reviews: {
+  reviews?: {  // オプショナルにする場合
     rating: number;
     count: number;
     comments: Array<{
@@ -29,4 +29,4 @@ export interface Quest {
     cardNumber: string; // No.000~099形式
     cardName: string;
   };
-}
+};
