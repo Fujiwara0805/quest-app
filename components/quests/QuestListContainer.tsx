@@ -5,11 +5,11 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { DateSelector } from './DateSelector';
 import { LocationSelector } from './LocationSelector';
 import { BottomNavigation } from './BottomNavigation';
-import { useQuests } from '../lib/hooks/useQuests';
-import { useLocation } from '../lib/hooks/useLocation';
-import { useFavorites } from '../lib/hooks/useFavorites';
+import { useQuests } from '../../lib/hooks/useQuests';
+import { useLocation } from '../../lib/hooks/useLocation';
+import { useFavorites } from '../../lib/hooks/useFavorites';
 import QuestList from './QuestList';
-import { SortType } from '@/app/lib/constants/sort-options';
+import { SortType } from '@/lib/constants/sort-options';
 
 export default function QuestListContainer() {
   const router = useRouter();

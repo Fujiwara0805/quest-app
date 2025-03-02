@@ -1,10 +1,11 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent } from '../../../../components/ui/card';
 import { PageHeader } from '@/app/(main)/components/page-header';
 import { createClient } from '@/utils/supabase/client';
 
+// クエスト作成画面
 export default function CreateQuestPage() {
   const router = useRouter();
   const supabase = createClient();
@@ -22,9 +23,82 @@ export default function CreateQuestPage() {
   const [rewardCardNumber, setRewardCardNumber] = useState("");
   const [rewardCardName, setRewardCardName] = useState("");
 
+  // 認証状態を管理するステート
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [userId, setUserId] = useState<string | null>(null);
+
+  // コンポーネントマウント時に認証状態を確認
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        // 現在のセッションを取得
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          console.error("セッション取得エラー:", sessionError);
+          throw sessionError;
+        }
+        
+        if (!session) {
+          console.log("セッションがありません");
+          alert('ログインが必要です');
+          router.push('/login?returnTo=/admin/quests/create');
+          return;
+        }
+        
+        // ユーザーIDを保存
+        setUserId(session.user.id);
+        
+        // 認証状態をログ出力（デバッグ用）
+        console.log("認証済みユーザー:", session.user);
+        console.log("ユーザーロール:", session.user.user_metadata?.role);
+        
+        // 認証トークンを確認（デバッグ用）
+        const { data: { user } } = await supabase.auth.getUser();
+        console.log("現在のユーザー:", user);
+        
+        // RLSテスト - 読み取り権限の確認
+        const { data: testData, error: testError } = await supabase
+          .from('quests')
+          .select('id')
+          .limit(1);
+          
+        if (testError) {
+          console.error("読み取りテストエラー:", testError);
+        } else {
+          console.log("読み取りテスト成功:", testData);
+        }
+        
+        setIsAuthenticated(true);
+      } catch (error) {
+        console.error("認証確認エラー:", error);
+        alert('認証エラーが発生しました');
+        router.push('/login');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    checkAuth();
+  }, [router, supabase]);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
+    // 認証状態を再確認
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      alert('セッションが切れました。再度ログインしてください。');
+      router.push('/login?returnTo=/admin/quests/create');
+      return;
+    }
+    
+    // デバッグ情報を出力
+    console.log("認証ユーザー情報:", session.user);
+    console.log("ユーザーID:", session.user.id);
+    console.log("ユーザーロール:", session.user.user_metadata?.role);
+
     try {
       // 接続確認
       const { data: connectionTest, error: connectionError } = await supabase
@@ -33,6 +107,7 @@ export default function CreateQuestPage() {
         .limit(1);
 
       if (connectionError) {
+        console.error("接続エラー詳細:", connectionError);
         throw new Error(`データベース接続エラー: ${connectionError.message}`);
       }
 
@@ -54,7 +129,7 @@ export default function CreateQuestPage() {
         image_url = fileName;
       }
       
-      // データ挿入部分の修正
+      // データ挿入部分の修正 - created_byフィールドを追加
       const { data: insertData, error: insertError } = await supabase
         .from('quests')
         .insert([
@@ -71,16 +146,18 @@ export default function CreateQuestPage() {
             image_url,
             reward_card_number: rewardCardNumber,
             reward_card_name: rewardCardName,
+            created_by: session.user.id  // ユーザーIDを追加
           }
         ])
         .select(); // 挿入後のデータを返す
         
       if (insertError) {
+        console.error("挿入エラー詳細:", insertError);
         throw new Error(`データ挿入エラー: ${insertError.message}, コード: ${insertError.code}`);
       }
       
       console.log('クエスト作成成功:', insertData);
-      router.push("/admin/create/complete");
+      router.push("/admin/quests/create/complete");
       
     } catch (error: any) {
       console.error("クエスト作成エラー:", error);
@@ -91,10 +168,30 @@ export default function CreateQuestPage() {
     }
   };
 
+  // ローディング中の表示
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+        <p className="ml-3 text-white">認証を確認中...</p>
+      </div>
+    );
+  }
+
+  // 未認証の場合は何も表示しない（useEffectでリダイレクト）
+  if (!isAuthenticated) {
+    return null;
+  }
+
   return (
     <>
       <PageHeader title="クエスト作成画面" />
       <div className="max-w-3xl mx-auto p-4">
+        {/* 認証情報の表示（デバッグ用） */}
+        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+          <p>認証済みユーザーID: {userId}</p>
+        </div>
+        
         <Card className="bg-[#463C2D]/80 backdrop-blur rounded-lg p-6 space-y-6 shadow-xl border border-[#C0A172]">
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">

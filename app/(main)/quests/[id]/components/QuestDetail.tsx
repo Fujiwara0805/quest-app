@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { Clock, MapPin, Users, Trophy, Star } from 'lucide-react';
 import { Share2 } from 'lucide-react';
-import { Quest } from '@/app/types/quest';
+import { Quest } from '@/lib/types/quest';
 import { FavoriteButton } from '@/components/FavoriteButton';
 
 interface QuestDetailProps {

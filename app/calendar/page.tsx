@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getQuestsByDate } from '@/app/data/quests';
-import { Quest } from '@/app/types/quest';
+import { Quest } from '@/lib/types/quest';
 
 export default function CalendarPage() {
   // Supabaseからデータを取得

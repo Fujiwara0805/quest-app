@@ -1,6 +1,6 @@
 
 import React, { Suspense } from 'react';
-import QuestListContainer from '../../components/quests/QuestListContainer';
+import QuestListContainer from '../../components/QuestListContainer';
 
 export default function Page() {
   return (

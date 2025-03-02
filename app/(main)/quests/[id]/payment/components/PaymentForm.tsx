@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ChevronLeft, CreditCard, QrCode } from 'lucide-react';
-import { Quest } from "@/app/types/quest";
+import { Quest } from "@/lib/types/quest";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { createClient } from '@/utils/supabase/client';

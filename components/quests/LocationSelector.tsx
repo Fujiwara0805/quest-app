@@ -6,13 +6,13 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { PREFECTURES } from '../data/prefectures';
-import { SORT_OPTIONS, SortType } from '../lib/constants/sort-options';
+} from "../ui/dropdown-menu";
+import { PREFECTURES } from '@/data/prefectures';
+import { SORT_OPTIONS, SortType } from '@/lib/constants/sort-options';
 import { useRouter } from 'next/navigation';
-import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
+import { Input } from '../ui/input';
+import { Switch } from '../ui/switch';
+import { Label } from '../ui/label';
 
 interface LocationSelectorProps {
   selectedPrefecture: string;

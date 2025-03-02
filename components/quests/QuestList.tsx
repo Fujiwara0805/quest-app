@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { QuestCard } from './QuestCard';
-import { Quest } from '../types/quest';
+import { Quest } from '@/lib/types/quest';
 import { getQuestsByDate } from '@/app/data/quests';
 
 interface QuestListProps {
