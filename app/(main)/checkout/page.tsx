@@ -1,6 +1,6 @@
 import { getQuests } from "@/app/data/quests";
-import { QuestDetail } from "./components/QuestDetail";
-import { Quest } from "@/app/types/quest";
+import { PurchaseForm } from "./components/PurchaseForm";
+import { Quest } from "@/lib/types/quest";
 
 // 静的パスを生成する関数
 export async function generateStaticParams() {
@@ -15,8 +15,8 @@ export async function generateStaticParams() {
   }
 }
 
-export default async function QuestDetailPage({ params }: { params: { questId: string } }) {
-  // すべてのクエストを取得して、IDに一致するものを探す
+export default async function PurchasePage({ params }: { params: { questId: string } }) {
+  // クエストデータを取得
   let quest: Quest | undefined;
   
   try {
@@ -39,5 +39,5 @@ export default async function QuestDetailPage({ params }: { params: { questId: s
     );
   }
 
-  return <QuestDetail quest={quest} />;
+  return <PurchaseForm quest={quest} />;
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { MainNav } from './components/main-nav';
+import { MainNav } from '../../components/main-nav';
 
 export default function MainLayout({
   children,

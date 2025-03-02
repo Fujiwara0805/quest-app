@@ -1,4 +1,4 @@
-import { Quest } from '../types/quest';
+import { Quest } from '../../lib/types/quest';
 import { createClient } from '@/utils/supabase/client';
 
 // URLが有効かどうかを確認する関数
@@ -15,6 +15,9 @@ export function isValidUrl(url: string): boolean {
 export async function getQuests(): Promise<Quest[]> {
   const supabase = createClient();
   
+  // クエリを実行する前にログを出力
+  console.log('Fetching quests from Supabase...');
+  
   const { data, error } = await supabase
     .from('quests')
     .select('*');
@@ -24,8 +27,16 @@ export async function getQuests(): Promise<Quest[]> {
     return [];
   }
   
+  // 生のデータをログに出力して確認
+  console.log('Raw Supabase data:', data.map(item => ({ id: item.id, title: item.title })));
+  
   // データベースから取得したデータをフロントエンドの型に変換
   return data.map((item: any) => {
+    // IDの処理を修正 - 変換前後の値をログに出力
+    const originalId = item.id;
+    const convertedId = item.id.toString();
+    console.log(`ID conversion: ${originalId} (${typeof originalId}) -> ${convertedId} (${typeof convertedId})`);
+    
     // 画像URLの処理
     let imageUrl = item.image_url;
     
@@ -45,7 +56,7 @@ export async function getQuests(): Promise<Quest[]> {
     }
     
     return {
-      id: item.id.toString(),
+      id: convertedId, // 変換後のIDを使用
       title: item.title,
       description: item.description,
       difficulty: item.quest_difficulty || '★',

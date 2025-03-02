@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { getQuests } from '@/app/data/quests';
-import { Quest } from '@/app/types/quest';
+import { Quest } from '@/lib/types/quest';
 
 export function useQuests(initialDate: Date) {
   const [selectedDate, setSelectedDate] = useState<Date>(initialDate);
