@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent } from '../../../../components/ui/card';
 import { PageHeader } from '@/app/(main)/components/page-header';
@@ -21,42 +21,8 @@ export default function CreateQuestPage() {
   const [rewardCardNumber, setRewardCardNumber] = useState("");
   const [rewardCardName, setRewardCardName] = useState("");
 
-  // 認証状態を管理するステート
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [userId, setUserId] = useState<string | null>(null);
-
-  // コンポーネントマウント時に認証状態を確認
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        // 一時的な認証チェック（NextAuthに置き換える前の実装）
-        // 開発中は常に認証済みとする
-        setIsAuthenticated(true);
-        setUserId("temp-user-id");
-        setIsLoading(false);
-        
-        console.log("認証済みユーザー: 開発用テストユーザー");
-      } catch (error) {
-        console.error("認証確認エラー:", error);
-        alert('認証エラーが発生しました');
-        router.push('/login');
-        setIsLoading(false);
-      }
-    };
-    
-    checkAuth();
-  }, [router]);
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
-    // 認証状態を再確認（一時的な実装）
-    if (!isAuthenticated) {
-      alert('セッションが切れました。再度ログインしてください。');
-      router.push('/login?returnTo=/admin/quests/create');
-      return;
-    }
     
     try {
       // 一時的な実装（実際のAPIエンドポイントが実装されるまで）
@@ -71,8 +37,7 @@ export default function CreateQuestPage() {
         ticketsAvailable: parseInt(ticketsAvailable, 10),
         ticketPrice: parseFloat(ticketPrice),
         rewardCardNumber,
-        rewardCardName,
-        userId
+        rewardCardName
       });
       
       // 成功したと仮定
@@ -85,29 +50,10 @@ export default function CreateQuestPage() {
     }
   };
 
-  // ローディング中の表示
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
-        <p className="ml-3 text-white">認証を確認中...</p>
-      </div>
-    );
-  }
-
-  // 未認証の場合は何も表示しない（useEffectでリダイレクト）
-  if (!isAuthenticated) {
-    return null;
-  }
-
   return (
     <>
       <PageHeader title="クエスト作成画面" />
       <div className="max-w-3xl mx-auto p-4">
-        {/* 認証情報の表示（デバッグ用） */}
-        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-          <p>認証済みユーザーID: {userId} (開発モード)</p>
-        </div>
         
         <Card className="bg-[#463C2D]/80 backdrop-blur rounded-lg p-6 space-y-6 shadow-xl border border-[#C0A172]">
           <CardContent>
@@ -254,10 +200,10 @@ export default function CreateQuestPage() {
                   />
                 </div>
               </div>
-              <div className="flex justify-end">
+              <div className="flex justify-center">
                 <button
                   type="submit"
-                  className="bg-purple-600 hover:bg-purple-700 text-white py-2 px-6 rounded-md transition"
+                  className="bg-purple-600 hover:bg-purple-700 text-white py-2 px-6 rounded-md transition w-full"
                 >
                   クエストを作成
                 </button>
@@ -266,6 +212,7 @@ export default function CreateQuestPage() {
           </CardContent>
         </Card>
       </div>
+      <div className="h-8"></div>
     </>
   );
 }

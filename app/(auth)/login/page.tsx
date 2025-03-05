@@ -44,13 +44,22 @@ export default function LoginPage() {
   const handleGoogleLogin = async () => {
     setIsGoogleLoading(true);
     try {
-      // 直接/questsへリダイレクトするように設定
-      await signIn('google', { 
+      const result = await signIn('google', { 
         callbackUrl: '/quests',
-        redirect: true
+        redirect: false  // リダイレクトを手動で処理するために false に変更
       });
+      
+      if (result?.error) {
+        console.error('Googleログインエラー:', result.error);
+        setError('Google認証中にエラーが発生しました');
+        setIsGoogleLoading(false);
+      } else {
+        // 成功した場合は手動でリダイレクト
+        router.push(result?.url || '/quests');
+      }
     } catch (error) {
       console.error('Googleログイン中にエラーが発生しました', error);
+      setError('認証処理中にエラーが発生しました');
       setIsGoogleLoading(false);
     }
   };

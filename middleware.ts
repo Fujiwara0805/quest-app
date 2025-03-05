@@ -6,7 +6,7 @@ export default withAuth(
   async function middleware(req) {
     const token = await getToken({ req });
     const isLoggedIn = !!token;
-    const isLoginPage = req.nextUrl.pathname.startsWith("/login")||req.nextUrl.pathname.startsWith("/register");
+    const isLoginPage = req.nextUrl.pathname.startsWith("/login") || req.nextUrl.pathname.startsWith("/register");
 
     if (isLoginPage) {
       if (isLoggedIn) {
@@ -14,9 +14,7 @@ export default withAuth(
       }
       return null;
     }
-    if (!isLoggedIn) {
-      return NextResponse.redirect(new URL("/login", req.url));
-    }
+    
     return null;
   },
   {
@@ -29,5 +27,12 @@ export default withAuth(
 );
 
 export const config = {
-  matcher: ["/login/:path*", "/register/:path*"],
+  matcher: [
+    "/login/:path*", 
+    "/register/:path*", 
+    "/quests/:path*",
+    "/quests",
+    "/profile/:path*",
+    "/settings/:path*"
+  ],
 };

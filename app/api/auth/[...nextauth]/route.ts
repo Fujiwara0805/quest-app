@@ -26,6 +26,12 @@ export const authOptions: NextAuthOptions = {
   },
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+      }
+      return token;
+    },
     async session({ session, token }) {
       if (token) {
         session.user.id = token.id;
@@ -35,8 +41,10 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
-    async redirect() {
-      return "/quests";
+    async redirect({ url, baseUrl }) {
+      if (url.startsWith(baseUrl)) return url;
+      if (url.startsWith("http")) return baseUrl;
+      return `${baseUrl}/quests`;
     }
   },
   pages: {
