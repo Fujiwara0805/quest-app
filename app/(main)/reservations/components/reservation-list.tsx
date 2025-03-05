@@ -4,30 +4,29 @@ import { useMemo, useState } from 'react';
 import { DUMMY_QUESTS } from '@/data/quests';
 import { CheckCircle, Clock, QrCode, X } from 'lucide-react';
 import { QRCodeModal } from './qr-code-modal';
-import { useReservations } from '../hooks/use-reservations';
+import { useReservations } from '../hooks/useReservations';
+import { Reservation } from '../hooks/useReservations';
 
 interface ReservationListProps {
-  status: 'reserved' | 'completed';
+  quests: Reservation[];
+  onQuestClick: (id: string) => void;
 }
 
-export function ReservationList({ status }: ReservationListProps) {
-  const [selectedQuestId, setSelectedQuestId] = useState<string | null>(null);
-  const { reservations } = useReservations(status);
-
-  if (reservations.length === 0) {
+export function ReservationList({ quests, onQuestClick }: ReservationListProps) {
+  if (quests.length === 0) {
     return (
       <div className="p-8 text-center text-[#E8D4B9]/70">
-        {status === 'reserved' ? '予約したクエストはありません' : '完了したクエストはありません'}
+        予約したクエストはありません
       </div>
     );
   }
 
   return (
     <div className="p-4 space-y-4">
-      {reservations.map((reservation) => (
+      {quests.map((reservation) => (
         <div
           key={reservation.id}
-          onClick={() => status === 'reserved' && setSelectedQuestId(reservation.id)}
+          onClick={() => reservation.status === 'reserved' && onQuestClick(reservation.id)}
           className={`
             p-4 rounded-lg border border-[#C0A172]/20 transition-all duration-200
             ${reservation.status === 'reserved' 
@@ -66,13 +65,6 @@ export function ReservationList({ status }: ReservationListProps) {
           </div>
         </div>
       ))}
-
-      {selectedQuestId && (
-        <QRCodeModal
-          quest={reservations.find(r => r.id === selectedQuestId)!}
-          onClose={() => setSelectedQuestId(null)}
-        />
-      )}
     </div>
   );
 }

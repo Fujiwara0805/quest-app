@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { Clock, MapPin, Users, Trophy, Star } from 'lucide-react';
 import { Share2 } from 'lucide-react';
 import { Quest } from '@/lib/types/quest';
-import { FavoriteButton } from '@/components/FavoriteButton';
+import { FavoriteButton } from '@/components/quests/FavoriteButton';
 
 interface QuestDetailProps {
   quest: Quest;
@@ -200,12 +200,16 @@ export function QuestDetail({ quest }: QuestDetailProps) {
               <Share2 className="w-6 h-6 text-[#E8D4B9]" />
             </button>
             <button
-              onClick={() => router.push(`/purchase/${quest.id}`)}
-              className="flex-1 py-4 text-lg font-medium rounded-lg transition-all duration-300
-                bg-purple-600 text-white hover:bg-purple-700 transform hover:scale-[1.02]"
-            >
-              購入へ進む
-            </button>
+  onClick={() => {
+    console.log('購入ボタンがクリックされました');
+    console.log(`Navigating to: /quests/${quest.id}/checkout`);
+    router.push(`/quests/${quest.id}/checkout`);
+  }}
+  className="flex-1 py-4 text-lg font-medium rounded-lg transition-all duration-300
+    bg-purple-600 text-white hover:bg-purple-700 transform hover:scale-[1.02]"
+>
+  購入へ進む
+</button>
           </div>
         </div>
       </div>

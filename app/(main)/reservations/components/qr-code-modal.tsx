@@ -1,14 +1,16 @@
 "use client";
 
 import { X, QrCode } from 'lucide-react';
-import { Reservation } from '../types';
+import { Reservation } from '../hooks/useReservations';
 
 interface QRCodeModalProps {
-  quest: Reservation;
+  quest: Reservation | undefined;
   onClose: () => void;
 }
 
 export function QRCodeModal({ quest, onClose }: QRCodeModalProps) {
+  if (!quest) return null;
+  
   return (
     <div 
       className="fixed inset-0 z-[100] flex items-center justify-center p-4"
@@ -18,7 +20,7 @@ export function QRCodeModal({ quest, onClose }: QRCodeModalProps) {
       <div className="absolute inset-0 bg-[url('/patterns/noise.png')] opacity-5" />
       
       <div 
-        className="relative w-full h-full bg-[#463C2D] rounded-xl border-2 border-[#C0A172] shadow-2xl overflow-auto"
+        className="relative w-full max-w-lg mx-auto bg-[#463C2D] rounded-xl border-2 border-[#C0A172] shadow-2xl overflow-hidden"
         onClick={e => e.stopPropagation()}
       >
         {/* 閉じるボタン */}
@@ -29,7 +31,7 @@ export function QRCodeModal({ quest, onClose }: QRCodeModalProps) {
           <X className="w-4 h-4" />
         </button>
 
-        <div className="p-6 sm:p-8 space-y-6 h-full flex flex-col justify-center">
+        <div className="p-6 sm:p-8 space-y-6">
           {/* タイトル */}
           <h3 className="text-xl sm:text-2xl font-bold text-center text-purple-400 px-8">
             {quest.title}

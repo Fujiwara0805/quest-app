@@ -55,8 +55,9 @@ export function PurchaseForm({ quest }: PurchaseFormProps) {
   const handleProceedToPayment = () => {
     if (!isFormComplete) return;
     
-    // 支払い画面へ遷移
-    router.push(`/payment/${quest.id}?date=${selectedDate}&time=${selectedTime}&quantity=${selectedQuantity}`);
+    console.log('支払い画面へ遷移します');
+    // 支払い画面へ遷移（パスを修正）
+    router.push(`/quests/${quest.id}/payment?date=${selectedDate}&time=${selectedTime}&quantity=${selectedQuantity}`);
   };
 
   // 日付をフォーマット

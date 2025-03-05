@@ -3,12 +3,10 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent } from '../../../../components/ui/card';
 import { PageHeader } from '@/app/(main)/components/page-header';
-import { createClient } from '@/utils/supabase/client';
 
 // クエスト作成画面
 export default function CreateQuestPage() {
   const router = useRouter();
-  const supabase = createClient();
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -32,138 +30,57 @@ export default function CreateQuestPage() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        // 現在のセッションを取得
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        
-        if (sessionError) {
-          console.error("セッション取得エラー:", sessionError);
-          throw sessionError;
-        }
-        
-        if (!session) {
-          console.log("セッションがありません");
-          alert('ログインが必要です');
-          router.push('/login?returnTo=/admin/quests/create');
-          return;
-        }
-        
-        // ユーザーIDを保存
-        setUserId(session.user.id);
-        
-        // 認証状態をログ出力（デバッグ用）
-        console.log("認証済みユーザー:", session.user);
-        console.log("ユーザーロール:", session.user.user_metadata?.role);
-        
-        // 認証トークンを確認（デバッグ用）
-        const { data: { user } } = await supabase.auth.getUser();
-        console.log("現在のユーザー:", user);
-        
-        // RLSテスト - 読み取り権限の確認
-        const { data: testData, error: testError } = await supabase
-          .from('quests')
-          .select('id')
-          .limit(1);
-          
-        if (testError) {
-          console.error("読み取りテストエラー:", testError);
-        } else {
-          console.log("読み取りテスト成功:", testData);
-        }
-        
+        // 一時的な認証チェック（NextAuthに置き換える前の実装）
+        // 開発中は常に認証済みとする
         setIsAuthenticated(true);
+        setUserId("temp-user-id");
+        setIsLoading(false);
+        
+        console.log("認証済みユーザー: 開発用テストユーザー");
       } catch (error) {
         console.error("認証確認エラー:", error);
         alert('認証エラーが発生しました');
         router.push('/login');
-      } finally {
         setIsLoading(false);
       }
     };
     
     checkAuth();
-  }, [router, supabase]);
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
-    // 認証状態を再確認
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
+    // 認証状態を再確認（一時的な実装）
+    if (!isAuthenticated) {
       alert('セッションが切れました。再度ログインしてください。');
       router.push('/login?returnTo=/admin/quests/create');
       return;
     }
     
-    // デバッグ情報を出力
-    console.log("認証ユーザー情報:", session.user);
-    console.log("ユーザーID:", session.user.id);
-    console.log("ユーザーロール:", session.user.user_metadata?.role);
-
     try {
-      // 接続確認
-      const { data: connectionTest, error: connectionError } = await supabase
-        .from('quests')
-        .select('id')
-        .limit(1);
-
-      if (connectionError) {
-        console.error("接続エラー詳細:", connectionError);
-        throw new Error(`データベース接続エラー: ${connectionError.message}`);
-      }
-
-      console.log('データベース接続成功:', connectionTest);
+      // 一時的な実装（実際のAPIエンドポイントが実装されるまで）
+      console.log("クエスト作成データ:", {
+        title,
+        description,
+        date,
+        startTime,
+        difficulty,
+        address,
+        access,
+        ticketsAvailable: parseInt(ticketsAvailable, 10),
+        ticketPrice: parseFloat(ticketPrice),
+        rewardCardNumber,
+        rewardCardName,
+        userId
+      });
       
-      let image_url = "";
-      if (image) {
-        const fileExt = image.name.split('.').pop();
-        const fileName = `${Date.now()}.${fileExt}`;
-
-        const { data: uploadData, error: uploadError } = await supabase
-          .storage
-          .from('quests-media')
-          .upload(fileName, image);
-
-        if (uploadError) throw uploadError;
-
-        // ファイル名のみを保存する（URLではなく）
-        image_url = fileName;
-      }
-      
-      // データ挿入部分の修正 - created_byフィールドを追加
-      const { data: insertData, error: insertError } = await supabase
-        .from('quests')
-        .insert([
-          {
-            title,
-            description,
-            date,
-            start_time: startTime,
-            difficulty,
-            address,
-            access,
-            tickets_available: parseInt(ticketsAvailable, 10),
-            ticket_price: parseFloat(ticketPrice),
-            image_url,
-            reward_card_number: rewardCardNumber,
-            reward_card_name: rewardCardName,
-            created_by: session.user.id  // ユーザーIDを追加
-          }
-        ])
-        .select(); // 挿入後のデータを返す
-        
-      if (insertError) {
-        console.error("挿入エラー詳細:", insertError);
-        throw new Error(`データ挿入エラー: ${insertError.message}, コード: ${insertError.code}`);
-      }
-      
-      console.log('クエスト作成成功:', insertData);
+      // 成功したと仮定
+      alert('クエストが作成されました（開発モード）');
       router.push("/admin/quests/create/complete");
       
     } catch (error: any) {
       console.error("クエスト作成エラー:", error);
-      if (error.message) {
-        console.error("エラーメッセージ:", error.message);
-      }
       alert(`エラーが発生しました: ${error.message || 'Unknown error'}`);
     }
   };
@@ -189,7 +106,7 @@ export default function CreateQuestPage() {
       <div className="max-w-3xl mx-auto p-4">
         {/* 認証情報の表示（デバッグ用） */}
         <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-          <p>認証済みユーザーID: {userId}</p>
+          <p>認証済みユーザーID: {userId} (開発モード)</p>
         </div>
         
         <Card className="bg-[#463C2D]/80 backdrop-blur rounded-lg p-6 space-y-6 shadow-xl border border-[#C0A172]">
@@ -337,16 +254,17 @@ export default function CreateQuestPage() {
                   />
                 </div>
               </div>
-              <button
-                type="submit"
-                className="bg-purple-600 text-white px-4 py-2 rounded-md w-full"
-              >
-                クエストを作成
-              </button>
+              <div className="flex justify-end">
+                <button
+                  type="submit"
+                  className="bg-purple-600 hover:bg-purple-700 text-white py-2 px-6 rounded-md transition"
+                >
+                  クエストを作成
+                </button>
+              </div>
             </form>
           </CardContent>
         </Card>
-        <div className="mb-8"></div>
       </div>
     </>
   );

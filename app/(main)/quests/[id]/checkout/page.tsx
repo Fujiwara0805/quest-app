@@ -15,13 +15,13 @@ export async function generateStaticParams() {
   }
 }
 
-export default async function PurchasePage({ params }: { params: { questId: string } }) {
+export default async function CheckoutPage({ params }: { params: { id: string } }) {
   // クエストデータを取得
   let quest: Quest | undefined;
   
   try {
     const quests = await getQuests();
-    quest = quests.find(q => q.id === params.questId);
+    quest = quests.find(q => String(q.id).trim().toLowerCase() === String(params.id).trim().toLowerCase());
   } catch (error) {
     console.error('クエスト取得エラー:', error);
   }

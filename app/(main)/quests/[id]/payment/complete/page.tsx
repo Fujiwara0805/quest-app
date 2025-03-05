@@ -52,7 +52,7 @@ export default function PaymentCompletePage() {
                 クエスト一覧へ
               </button>
               <button
-                onClick={() => router.push('/reservations')}
+                onClick={() => router.push(`/quests`)}
                 className="flex-1 py-3 text-white font-medium rounded-lg
                   bg-purple-600 hover:bg-purple-700
                   transition-colors"

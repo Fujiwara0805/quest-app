@@ -2,18 +2,6 @@ import { getQuests } from "@/app/data/quests";
 import { QuestDetail } from "./components/QuestDetail";
 import { Quest } from "@/lib/types/quest";
 
-// // 静的パスを生成する関数
-// export async function generateStaticParams() {
-//   try {
-//     const quests = await getQuests();
-//     return quests.map(quest => ({
-//       id: quest.id
-//     }));
-//   } catch (error) {
-//     console.error('静的パス生成エラー:', error);
-//     return [];
-//   }
-// }
 
 export default async function QuestDetailPage({ params }: { params: { id: string } }) {
   // すべてのクエストを取得して、IDに一致するものを探す

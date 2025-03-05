@@ -1,5 +1,3 @@
-// "use client"; // この行を削除して、サーバーコンポーネントとして扱います。
-
 import React, { Suspense } from 'react';
 import { getQuests } from "@/app/data/quests";
 import { PaymentForm } from "./components/PaymentForm";
@@ -9,7 +7,7 @@ export async function generateStaticParams() {
   try {
     const quests = await getQuests();
     return quests.map(quest => ({
-      questId: quest.id
+      id: quest.id
     }));
   } catch (error) {
     console.error('静的パス生成エラー:', error);
@@ -17,10 +15,12 @@ export async function generateStaticParams() {
   }
 }
 
-export default function PaymentPage({ params }: { params: { questId: string } }) {
+export default function PaymentPage({ params }: { params: { id: string } }) {
+  console.log('Payment Page Params:', params);
+  
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <PaymentForm questId={params.questId} />
+      <PaymentForm questId={params.id} />
     </Suspense>
   );
 }
