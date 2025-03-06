@@ -1,18 +1,31 @@
 "use client";
 
-import { useState } from 'react';
-import { signIn } from 'next-auth/react';
+import { useState, useEffect } from 'react';
+import { signIn, useSession } from 'next-auth/react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { FaGoogle, FaEnvelope, FaLock, FaUserPlus, FaSpinner } from 'react-icons/fa';
+import { FaGoogle, FaEnvelope, FaLock, FaUserPlus, FaSpinner, FaUserShield } from 'react-icons/fa';
 
 export default function LoginPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { data: session, status } = useSession();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [isGoogleLoading, setIsGoogleLoading] = useState<boolean>(false);
+  const [isAdminLogin, setIsAdminLogin] = useState<boolean>(false);
+
+  // 既にログインしている場合はリダイレクト
+  useEffect(() => {
+    if (status === 'authenticated') {
+      if (session?.user?.role === 'admin') {
+        router.push('/admin/quests/create');
+      } else {
+        router.push('/quests');
+      }
+    }
+  }, [status, session, router]);
 
   // エラーメッセージがURLに含まれている場合は表示
   const errorFromUrl = searchParams.get('error');
@@ -44,18 +57,15 @@ export default function LoginPage() {
   const handleGoogleLogin = async () => {
     setIsGoogleLoading(true);
     try {
-      const result = await signIn('google', { 
-        callbackUrl: '/quests',
-        redirect: false  // リダイレクトを手動で処理するために false に変更
-      });
-      
-      if (result?.error) {
-        console.error('Googleログインエラー:', result.error);
-        setError('Google認証中にエラーが発生しました');
-        setIsGoogleLoading(false);
+      // 管理者ログインの場合は、管理者メールアドレスをヒントとして表示
+      if (isAdminLogin) {
+        await signIn('google', { 
+          callbackUrl: '/admin/quests/create',
+        });
       } else {
-        // 成功した場合は手動でリダイレクト
-        router.push(result?.url || '/quests');
+        await signIn('google', { 
+          callbackUrl: '/quests',
+        });
       }
     } catch (error) {
       console.error('Googleログイン中にエラーが発生しました', error);
@@ -67,6 +77,16 @@ export default function LoginPage() {
   const handleRegister = () => {
     router.push('/register');
   };
+
+  const toggleAdminLogin = () => {
+    setIsAdminLogin(!isAdminLogin);
+    if (!isAdminLogin) {
+      // 管理者ログインモードに切り替えたら、管理者メールアドレスを自動入力
+      setEmail('quest202412@gmail.com');
+    } else {
+      setEmail('');
+    }
+  };
   
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-4 ">
@@ -75,12 +95,20 @@ export default function LoginPage() {
       <div className="w-full max-w-md space-y-8 bg-[#463C2D]/90 backdrop-blur rounded-lg p-6 shadow-xl border border-[#C0A172]">
         <div className="text-center">
           <h2 className="text-3xl font-bold text-purple-400">Quest App</h2>
-          <p className="mt-2 text-[#E8D4B9]/80">アカウントにログインしてください</p>
+          <p className="mt-2 text-[#E8D4B9]/80">
+            {isAdminLogin ? '管理者アカウントでログイン' : 'アカウントにログインしてください'}
+          </p>
         </div>
         
         {(error || errorFromUrl) && (
           <div className="bg-red-900/50 border border-red-500 text-red-200 px-4 py-3 rounded text-sm">
             {error || (errorFromUrl === 'Callback' ? 'ログイン処理中にエラーが発生しました' : errorFromUrl)}
+          </div>
+        )}
+
+        {isAdminLogin && (
+          <div className="bg-purple-900/50 border border-purple-500 text-purple-200 px-4 py-3 rounded text-sm">
+            管理者ログインモード: quest202412@gmail.com でログインすると、クエスト作成画面に直接遷移します。
           </div>
         )}
         
@@ -135,26 +163,46 @@ export default function LoginPage() {
           <button
             onClick={handleGoogleLogin}
             disabled={isGoogleLoading}
-            className="w-full flex items-center justify-center gap-3 py-3 px-4 bg-white hover:bg-gray-100 rounded-md text-gray-800 font-medium transition disabled:opacity-70 disabled:cursor-not-allowed"
+            className={`w-full flex items-center justify-center gap-3 py-3 px-4 rounded-md font-medium transition disabled:opacity-70 disabled:cursor-not-allowed ${
+              isAdminLogin 
+                ? 'bg-purple-700 hover:bg-purple-800 text-white' 
+                : 'bg-white hover:bg-gray-100 text-gray-800'
+            }`}
           >
             {isGoogleLoading ? (
-              <FaSpinner className="text-purple-500 animate-spin" />
+              <FaSpinner className={isAdminLogin ? "text-white animate-spin" : "text-purple-500 animate-spin"} />
             ) : (
               <>
-                <FaGoogle className="text-purple-500" />
-                Googleでログイン
+                {isAdminLogin ? (
+                  <FaUserShield className="text-white" />
+                ) : (
+                  <FaGoogle className="text-purple-500" />
+                )}
+                {isAdminLogin ? '管理者としてログイン' : 'Googleでログイン'}
               </>
             )}
           </button>
         </div>
         
-        <div className="pt-2 border-t border-[#C0A172]/20">
+        <div className="pt-2 border-t border-[#C0A172]/20 flex flex-col sm:flex-row justify-between gap-2">
           <button
             onClick={handleRegister}
-            className="w-full flex items-center justify-center gap-2 py-2 px-4 bg-[#2A241B]/60 hover:bg-[#2A241B] text-[#E8D4B9] rounded-md transition mt-2"
+            className="flex-1 flex items-center justify-center gap-2 py-2 px-4 bg-[#2A241B]/60 hover:bg-[#2A241B] text-[#E8D4B9] rounded-md transition"
           >
             <FaUserPlus className="text-[#C0A172]" />
             アカウントを新規作成
+          </button>
+          
+          <button
+            onClick={toggleAdminLogin}
+            className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-md transition ${
+              isAdminLogin 
+                ? 'bg-purple-900/60 hover:bg-purple-900 text-white' 
+                : 'bg-[#2A241B]/60 hover:bg-[#2A241B] text-[#E8D4B9]'
+            }`}
+          >
+            <FaUserShield className={isAdminLogin ? "text-white" : "text-[#C0A172]"} />
+            {isAdminLogin ? '一般ユーザーログインに戻る' : '管理者ログイン'}
           </button>
         </div>
       </div>

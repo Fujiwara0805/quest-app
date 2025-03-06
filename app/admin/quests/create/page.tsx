@@ -1,12 +1,14 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from "next-auth/react";
 import { Card, CardContent } from '../../../../components/ui/card';
 import { PageHeader } from '@/app/(main)/components/page-header';
 
 // クエスト作成画面
 export default function CreateQuestPage() {
   const router = useRouter();
+  const { data: session, status } = useSession();
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -20,33 +22,93 @@ export default function CreateQuestPage() {
   const [image, setImage] = useState<File | null>(null);
   const [rewardCardNumber, setRewardCardNumber] = useState("");
   const [rewardCardName, setRewardCardName] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // 認証状態をチェック
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/login");
+    } else if (status === "authenticated" && session?.user?.role !== "admin") {
+      router.push("/");
+    }
+  }, [status, session, router]);
+
+  // ローディング中
+  if (status === "loading") {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+        <p className="ml-3 text-white">読み込み中...</p>
+      </div>
+    );
+  }
+
+  // 管理者でない場合は何も表示しない（useEffectでリダイレクト）
+  if (status === "authenticated" && session?.user?.role !== "admin") {
+    return null;
+  }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsSubmitting(true);
     
     try {
-      // 一時的な実装（実際のAPIエンドポイントが実装されるまで）
-      console.log("クエスト作成データ:", {
+      // 画像のアップロード処理
+      let imageUrl = null;
+      if (image) {
+        const formData = new FormData();
+        formData.append('file', image);
+        
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+        });
+        
+        if (!response.ok) {
+          throw new Error('画像のアップロードに失敗しました');
+        }
+        
+        const data = await response.json();
+        imageUrl = data.url;
+      }
+      
+      // クエストデータをAPIに送信
+      const questData = {
         title,
         description,
-        date,
-        startTime,
         difficulty,
+        questDate: date ? new Date(date) : null,
+        startTime,
         address,
         access,
-        ticketsAvailable: parseInt(ticketsAvailable, 10),
-        ticketPrice: parseFloat(ticketPrice),
+        ticketsAvailable: ticketsAvailable ? parseInt(ticketsAvailable, 10) : null,
+        ticketPrice: ticketPrice ? parseFloat(ticketPrice) : null,
+        imageUrl,
         rewardCardNumber,
         rewardCardName
+      };
+      
+      const response = await fetch('/api/quests', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(questData),
       });
       
-      // 成功したと仮定
-      alert('クエストが作成されました（開発モード）');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'クエストの作成に失敗しました');
+      }
+      
+      alert('クエストが作成されました');
       router.push("/admin/quests/create/complete");
       
     } catch (error: any) {
       console.error("クエスト作成エラー:", error);
       alert(`エラーが発生しました: ${error.message || 'Unknown error'}`);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -203,9 +265,10 @@ export default function CreateQuestPage() {
               <div className="flex justify-center">
                 <button
                   type="submit"
-                  className="bg-purple-600 hover:bg-purple-700 text-white py-2 px-6 rounded-md transition w-full"
+                  disabled={isSubmitting}
+                  className="bg-purple-600 hover:bg-purple-700 text-white py-2 px-6 rounded-md transition w-full disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  クエストを作成
+                  {isSubmitting ? '作成中...' : 'クエストを作成'}
                 </button>
               </div>
             </form>
