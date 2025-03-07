@@ -17,9 +17,6 @@ export async function POST(req: NextRequest) {
     // リクエストボディからデータを取得
     const data = await req.json();
     
-    // 画像URLの処理
-    let imageUrl = data.imageUrl;
-    
     // Prismaを使用してクエストを作成
     const quest = await db.quest.create({
       data: {
@@ -32,7 +29,8 @@ export async function POST(req: NextRequest) {
         access: data.access,
         ticketsAvailable: data.ticketsAvailable,
         ticketPrice: data.ticketPrice,
-        imageUrl: imageUrl,
+        imageUrl: data.imageUrl,
+        imagePath: data.imagePath,
         rewardCardNumber: data.rewardCardNumber,
         rewardCardName: data.rewardCardName,
       },

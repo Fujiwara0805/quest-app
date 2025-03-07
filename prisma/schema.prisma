@@ -73,6 +73,7 @@ model Quest {
   ticketsAvailable Int?     @map("tickets_available")
   ticketPrice      Float?   @map("ticket_price")
   imageUrl         String?  @map("image_url")
+  imagePath        String?  @map("image_path")
   reviews          Json?
   rewardCardNumber String?  @map("reward_card_number")
   rewardCardName   String?  @map("reward_card_name")

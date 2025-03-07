@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile } from 'fs/promises';
-import { join } from 'path';
-import { v4 as uuidv4 } from 'uuid';
-import { getServerSession } from 'next-auth/next';
+import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { supabase } from '@/lib/supabase';
+import { v4 as uuidv4 } from 'uuid';
 
 export async function POST(req: NextRequest) {
   try {
@@ -27,35 +26,46 @@ export async function POST(req: NextRequest) {
     }
     
     // ファイル名を生成（一意のIDを使用）
-    const fileExtension = file.name.split('.').pop();
-    const fileName = `${uuidv4()}.${fileExtension}`;
-    
-    // ファイルを保存するパス
-    const publicDir = join(process.cwd(), 'public');
-    const uploadsDir = join(publicDir, 'uploads');
-    
-    // uploadsディレクトリが存在することを確認
-    try {
-      await writeFile(join(uploadsDir, '.gitkeep'), '');
-    } catch (error) {
-      // ディレクトリが存在しない場合は作成
-      const { mkdir } = require('fs/promises');
-      await mkdir(uploadsDir, { recursive: true });
-    }
-    
-    const filePath = join(uploadsDir, fileName);
+    const fileExtension = file.name.split('.').pop() || 'jpg';
+    const fileName = `${Date.now()}_${uuidv4()}.${fileExtension}`;
     
     // ファイルをバイナリデータとして読み込む
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
     
-    // ファイルを保存
-    await writeFile(filePath, buffer);
+    // バケット名を確認（正確なバケット名を使用）
+    const bucketName = 'quests-image';
     
-    // 保存したファイルのURLを返す
-    const fileUrl = `/uploads/${fileName}`;
+    // デバッグ情報をログに出力
+    console.log(`Uploading file to bucket: ${bucketName}, filename: ${fileName}`);
     
-    return NextResponse.json({ url: fileUrl }, { status: 201 });
+    // Supabaseのストレージにアップロード
+    const { data, error } = await supabase.storage
+      .from(bucketName)
+      .upload(fileName, buffer, {
+        contentType: file.type || 'application/octet-stream',
+        cacheControl: '3600',
+        upsert: false
+      });
+    
+    if (error) {
+      console.error('Supabaseアップロードエラー:', error);
+      return NextResponse.json(
+        { message: `ファイルアップロードに失敗しました: ${error.message}` },
+        { status: 500 }
+      );
+    }
+    
+    // 公開URLを取得
+    const { data: publicUrlData } = supabase.storage
+      .from(bucketName)
+      .getPublicUrl(fileName);
+    
+    return NextResponse.json({ 
+      url: publicUrlData.publicUrl,
+      path: fileName
+    }, { status: 201 });
+    
   } catch (error: any) {
     console.error('ファイルアップロードエラー:', error);
     return NextResponse.json(

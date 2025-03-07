@@ -55,6 +55,8 @@ export default function CreateQuestPage() {
     try {
       // 画像のアップロード処理
       let imageUrl = null;
+      let imagePath = null;
+      
       if (image) {
         const formData = new FormData();
         formData.append('file', image);
@@ -71,6 +73,7 @@ export default function CreateQuestPage() {
         
         const data = await response.json();
         imageUrl = data.url;
+        imagePath = data.path;
       }
       
       // クエストデータをAPIに送信
@@ -85,6 +88,7 @@ export default function CreateQuestPage() {
         ticketsAvailable: ticketsAvailable ? parseInt(ticketsAvailable, 10) : null,
         ticketPrice: ticketPrice ? parseFloat(ticketPrice) : null,
         imageUrl,
+        imagePath,
         rewardCardNumber,
         rewardCardName
       };
