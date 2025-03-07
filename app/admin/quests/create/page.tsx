@@ -65,7 +65,8 @@ export default function CreateQuestPage() {
         });
         
         if (!response.ok) {
-          throw new Error('画像のアップロードに失敗しました');
+          const errorData = await response.json();
+          throw new Error(errorData.message || '画像のアップロードに失敗しました');
         }
         
         const data = await response.json();
@@ -77,7 +78,7 @@ export default function CreateQuestPage() {
         title,
         description,
         difficulty,
-        questDate: date ? new Date(date) : null,
+        questDate: date ? new Date(date).toISOString() : null,
         startTime,
         address,
         access,

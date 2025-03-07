@@ -1,10 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
 export async function POST(req: NextRequest) {
   try {
+    // 認証チェック
+    const session = await getServerSession(authOptions);
+    if (!session || session.user.role !== 'admin') {
+      return NextResponse.json(
+        { message: '権限がありません' },
+        { status: 403 }
+      );
+    }
+
     // リクエストボディからデータを取得
     const data = await req.json();
+    
+    // 画像URLの処理
+    let imageUrl = data.imageUrl;
     
     // Prismaを使用してクエストを作成
     const quest = await db.quest.create({
@@ -12,13 +26,13 @@ export async function POST(req: NextRequest) {
         title: data.title,
         description: data.description,
         difficulty: data.difficulty,
-        questDate: data.questDate,
+        questDate: data.questDate ? new Date(data.questDate) : null,
         startTime: data.startTime,
         address: data.address,
         access: data.access,
         ticketsAvailable: data.ticketsAvailable,
         ticketPrice: data.ticketPrice,
-        imageUrl: data.imageUrl,
+        imageUrl: imageUrl,
         rewardCardNumber: data.rewardCardNumber,
         rewardCardName: data.rewardCardName,
       },
