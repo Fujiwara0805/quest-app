@@ -122,7 +122,7 @@ export const authOptions: NextAuthOptions = {
           });
           
           if (recentSession?.user?.email === "quest202412@gmail.com") {
-            return `${baseUrl}/admin/quests/create`;
+            return `${baseUrl}/admin/dashboard`;
           }
           
           // または直接データベースからユーザーを確認
@@ -136,7 +136,7 @@ export const authOptions: NextAuthOptions = {
             const latestSession = adminUser.sessions[0];
             const now = new Date();
             if (latestSession.expires > now) {
-              return `${baseUrl}/admin/quests/create`;
+              return `${baseUrl}/admin/dashboard`;
             }
           }
         } catch (error) {
@@ -147,14 +147,14 @@ export const authOptions: NextAuthOptions = {
       // callbackUrlが明示的に指定されている場合はそれを優先
       if (url.includes('callbackUrl=')) {
         const callbackUrl = new URL(url).searchParams.get('callbackUrl');
-        if (callbackUrl && callbackUrl.includes('/admin/quests/create')) {
+        if (callbackUrl && callbackUrl.includes('/admin/dashboard')) {
           return callbackUrl;
         }
       }
       
       // 管理者ダッシュボードへのリダイレクトが指定されている場合
-      if (url.includes('/admin/quests/create')) {
-        return `${baseUrl}/admin/quests/create`;
+      if (url.includes('/admin/dashboard')) {
+        return `${baseUrl}/admin/dashboard`;
       }
       
       // デフォルトのリダイレクト処理

@@ -13,7 +13,7 @@ export default withAuth(
     if (isLoggedIn) {
       // 管理者メールアドレスの場合、ログインページにいる場合は管理者ページにリダイレクト
       if (isAdminEmail && isLoginPage) {
-        return NextResponse.redirect(new URL("/admin/quests/create", req.url));
+        return NextResponse.redirect(new URL("/admin/quests/dashboard", req.url));
       }
       
       // 一般ユーザーがログインページにいる場合はクエスト一覧にリダイレクト
@@ -37,7 +37,7 @@ export default withAuth(
     
     // クエスト一覧ページにアクセスした管理者を管理者ページにリダイレクト
     if (isAdminEmail && req.nextUrl.pathname === "/quests") {
-      return NextResponse.redirect(new URL("/admin/quests/create", req.url));
+      return NextResponse.redirect(new URL("/admin/quests/dashboard", req.url));
     }
     
     return null;

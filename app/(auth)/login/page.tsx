@@ -20,7 +20,7 @@ export default function LoginPage() {
   useEffect(() => {
     if (status === 'authenticated') {
       if (session?.user?.role === 'admin') {
-        router.push('/admin/quests/create');
+        router.push('/admin/dashboard');
       } else {
         router.push('/quests');
       }
@@ -60,7 +60,7 @@ export default function LoginPage() {
       // 管理者ログインの場合は、管理者メールアドレスをヒントとして表示
       if (isAdminLogin) {
         await signIn('google', { 
-          callbackUrl: '/admin/quests/create',
+          callbackUrl: '/admin/dashboard',
         });
       } else {
         await signIn('google', { 
