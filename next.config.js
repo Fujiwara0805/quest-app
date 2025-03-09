@@ -5,6 +5,13 @@ const nextConfig = {
   },
   images: {
     domains: ['images.unsplash.com', 'api.qrserver.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'bvuxlenkwhohfvismdzn.supabase.co',
+        pathname: '/storage/v1/object/public/**',
+      },
+    ],
   },
 };
 

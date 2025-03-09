@@ -1,10 +1,58 @@
-export type Quest = {
-  id: string;
+export interface Quest {
+  id: string | number;
+  title: string;
+  description?: string;
+  difficulty: string;
+  date: string | Date;
+  startTime?: string;
+  location: {
+    address: string;
+    access?: string;
+  };
+  tickets: {
+    available: number;
+    price?: number;
+  };
+  reward: {
+    cardNumber?: string;
+    cardName: string;
+  };
+  image?: string;
+  reviews?: {
+    rating: number;
+    count: number;
+    comments?: {
+      id: string | number;
+      author: string;
+      rating: number;
+      comment: string;
+      date: string | Date;
+    }[];
+  };
+}
+
+export interface QuestFormData {
   title: string;
   description: string;
   difficulty: string;
-  date: Date;
-  startTime: string; // 追加: HH:mm形式
+  questDate: string | null;
+  startTime: string;
+  address: string;
+  access: string;
+  ticketsAvailable: number | null;
+  ticketPrice: number | null;
+  imageUrl: string;
+  imagePath: string;
+  rewardCardNumber: string;
+  rewardCardName: string;
+}
+
+export interface QuestPreviewData {
+  title: string;
+  description: string;
+  date: Date | null;
+  startTime: string;
+  difficulty: string;
   location: {
     address: string;
     access: string;
@@ -13,20 +61,9 @@ export type Quest = {
     available: number;
     price: number;
   };
-  reviews?: {  // オプショナルにする場合
-    rating: number;
-    count: number;
-    comments: Array<{
-      id: string;
-      author: string;
-      rating: number;
-      comment: string;
-      date: Date;
-    }>;
-  };
-  image: string;
   reward: {
-    cardNumber: string; // No.000~099形式
+    cardNumber: string;
     cardName: string;
   };
-};
+  image: string;
+}
