@@ -1,49 +1,33 @@
 "use client";
 
 import { useState, useEffect, useMemo } from 'react';
-import { getQuests } from '@/app/data/quests';
 import { Quest } from '@/lib/types/quest';
+import { getQuests } from '@/app/data/quests';
+import { SortType } from '@/lib/constants/sort-options';
 
 export function useQuests(initialDate: Date) {
   const [selectedDate, setSelectedDate] = useState<Date>(initialDate);
-  const [sortType, setSortType] = useState<string>('date');
+  const [allQuests, setAllQuests] = useState<Quest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  const [allQuests, setAllQuests] = useState<Quest[]>([]);
+  const [sortType, setSortType] = useState<SortType>('nearDate');
 
-  // Supabaseからデータを取得
+  // Supabaseからクエストデータを取得
   useEffect(() => {
-    let isMounted = true; // コンポーネントがマウントされているかを追跡
-    
-    async function loadQuests() {
+    async function fetchQuests() {
+      setIsLoading(true);
       try {
-        setIsLoading(true);
         const data = await getQuests();
-        
-        // コンポーネントがまだマウントされている場合のみ状態を更新
-        if (isMounted) {
-          setAllQuests(data);
-        }
+        setAllQuests(data);
       } catch (err) {
-        // コンポーネントがまだマウントされている場合のみ状態を更新
-        if (isMounted) {
-          console.error('クエスト取得エラー:', err);
-          setError(err instanceof Error ? err : new Error('クエスト取得中にエラーが発生しました'));
-        }
+        console.error('クエスト取得エラー:', err);
+        setError(err instanceof Error ? err : new Error('クエスト取得中にエラーが発生しました'));
       } finally {
-        // コンポーネントがまだマウントされている場合のみ状態を更新
-        if (isMounted) {
-          setIsLoading(false);
-        }
+        setIsLoading(false);
       }
     }
-    
-    loadQuests();
-    
-    // クリーンアップ関数
-    return () => {
-      isMounted = false;
-    };
+
+    fetchQuests();
   }, []);
 
   // クエストをソート
@@ -53,12 +37,25 @@ export function useQuests(initialDate: Date) {
     }
     
     return [...allQuests].sort((a, b) => {
-      if (sortType === 'date') {
-        return a.date.getTime() - b.date.getTime();
-      } else if (sortType === 'price') {
-        return a.tickets.price - b.tickets.price;
-      } else if (sortType === 'rating') {
-        return (b.reviews?.rating || 0) - (a.reviews?.rating || 0);
+      if (sortType === 'nearDate') {
+        // dateがstring型の場合はDateオブジェクトに変換
+        const dateA = a.date instanceof Date ? a.date : new Date(a.date);
+        const dateB = b.date instanceof Date ? b.date : new Date(b.date);
+        return dateA.getTime() - dateB.getTime();
+      } else if (sortType === 'highPrice') {
+        // priceがundefinedの場合は0として扱う
+        const priceA = a.tickets.price ?? 0;
+        const priceB = b.tickets.price ?? 0;
+        return priceB - priceA; // 高い順
+      } else if (sortType === 'lowPrice') {
+        const priceA = a.tickets.price ?? 0;
+        const priceB = b.tickets.price ?? 0;
+        return priceA - priceB; // 安い順
+      } else if (sortType === 'lowTickets') {
+        return a.tickets.available - b.tickets.available; // 残りが少ない順
+      } else if (sortType === 'difficulty') {
+        // 難易度（★の数）で比較
+        return b.difficulty.length - a.difficulty.length;
       }
       return 0;
     });

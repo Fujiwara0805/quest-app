@@ -192,7 +192,7 @@ export function QuestDetail({ quest }: QuestDetailProps) {
         {/* フッター */}
         <div className="fixed bottom-0 left-0 right-0 p-4 bg-[#463C2D]/95 backdrop-blur border-t border-[#C0A172]">
           <div className="container mx-auto max-w-2xl flex items-center gap-4">
-            <FavoriteButton questId={quest.id} />
+            <FavoriteButton questId={quest.id.toString()} />
             <button
               className="flex items-center justify-center p-3 rounded-full bg-[#5C4D3C]/50 hover:bg-[#5C4D3C] transition-colors border border-[#C0A172]"
               aria-label="シェア"

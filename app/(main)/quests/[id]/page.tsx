@@ -1,33 +1,16 @@
-import { getQuests } from "@/app/data/quests";
+import { getQuestById } from "@/app/data/quests";
 import { QuestDetail } from "./components/QuestDetail";
-import { Quest } from "@/lib/types/quest";
-
 
 export default async function QuestDetailPage({ params }: { params: { id: string } }) {
-  // すべてのクエストを取得して、IDに一致するものを探す
-  let quest: Quest | undefined;
-  
-  try {
-    const quests = await getQuests();
-    console.log('Params ID:', params.id, typeof params.id);
-    console.log('Available Quests:', quests.map(q => ({ id: q.id, type: typeof q.id })));
-    
-    // より柔軟な比較を試みる
-    quest = quests.find(q => 
-      String(q.id).trim().toLowerCase() === String(params.id).trim().toLowerCase()
-    );
-    
-    console.log('Found Quest:', quest);
-  } catch (error) {
-    console.error('クエスト取得エラー:', error);
-  }
+  // IDに基づいてSupabaseから特定のクエストを取得
+  const quest = await getQuestById(params.id);
 
   if (!quest) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#3a2820]">
         <div className="text-white text-center">
           <h1 className="text-2xl font-bold mb-4">クエストが見つかりません</h1>
-          <a href="/" className="inline-block bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg">
+          <a href="/quests" className="inline-block bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg">
             クエスト一覧に戻る
           </a>
         </div>

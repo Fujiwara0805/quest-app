@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Quest } from '@/types/quest';
+
 
 export function useFavorites() {
   const [favorites, setFavorites] = useState<string[]>([]);

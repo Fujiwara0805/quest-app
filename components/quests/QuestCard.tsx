@@ -59,7 +59,7 @@ export function QuestCard({ quest }: QuestCardProps) {
                 <span>{quest.difficulty}</span>
               </div>
             </div>
-            <FavoriteButton questId={quest.id} />
+            <FavoriteButton questId={quest.id.toString()} />
           </div>
 
           <div>
@@ -95,7 +95,7 @@ export function QuestCard({ quest }: QuestCardProps) {
             <div className="flex flex-col">
               <span className="text-xs text-white/80">チケット</span>
               <span className="text-lg font-bold text-emerald-400">
-                ¥{quest.tickets.price.toLocaleString()}
+                ¥{quest.tickets.price?.toLocaleString() || '0'}
               </span>
             </div>
             <div className="text-right">

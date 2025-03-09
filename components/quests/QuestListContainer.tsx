@@ -62,7 +62,7 @@ export default function QuestListContainer() {
     .filter(quest => {
       // お気に入り表示の場合
       if (showFavorites) {
-        return favorites.includes(quest.id);
+        return favorites.includes(quest.id.toString());
       }
       // 日付検索が有効な場合のみ日付でフィルタリング
       if (dateSearchEnabled) {
@@ -84,7 +84,7 @@ export default function QuestListContainer() {
         const searchLower = searchQuery.toLowerCase();
         return (
           quest.title.toLowerCase().includes(searchLower) ||
-          quest.description.toLowerCase().includes(searchLower) ||
+          quest.description?.toLowerCase().includes(searchLower) ||
           quest.location.address.toLowerCase().includes(searchLower)
         );
       }
