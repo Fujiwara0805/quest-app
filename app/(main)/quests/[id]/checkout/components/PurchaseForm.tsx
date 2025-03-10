@@ -180,7 +180,7 @@ export function PurchaseForm({ quest }: PurchaseFormProps) {
                 <div className="flex justify-between items-center text-white">
                   <span className="text-lg">合計金額</span>
                   <span className="text-xl font-bold">
-                    ¥{(quest.tickets.price * (parseInt(selectedQuantity) || 0)).toLocaleString()}
+                    ¥{(quest.tickets.price ?? 0) * (parseInt(selectedQuantity) || 0)}
                   </span>
                 </div>
               </div>
