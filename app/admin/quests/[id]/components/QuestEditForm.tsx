@@ -178,15 +178,9 @@ export function QuestEditForm({ quest, questId, onQuestUpdated, onError }: Quest
 
   return (
     <>
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+      {/* <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
         <h1 className="text-3xl font-bold text-white">クエスト編集</h1>
-        <Link
-          href={`/admin/quests/${questId}/delete`}
-          className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-md flex items-center gap-2 mt-4 md:mt-0"
-        >
-          <FaTrash /> このクエストを削除
-        </Link>
-      </div>
+      </div> */}
       
       <Card className="bg-[#463C2D]/80 backdrop-blur rounded-lg p-6 space-y-6 shadow-xl border border-[#C0A172]">
         <CardContent>
@@ -390,12 +384,19 @@ export function QuestEditForm({ quest, questId, onQuestUpdated, onError }: Quest
               </div>
             </div>
             
-            {/* 送信ボタン */}
-            <div className="flex justify-end mt-8">
+            {/* 送信ボタンと削除ボタンを横並びに配置 */}
+            <div className="flex justify-between items-center mt-8 gap-4">
+              <Link
+                href={`/admin/quests/${questId}/delete`}
+                className="bg-red-600 hover:bg-red-700 text-white py-3 px-6 rounded-md flex items-center justify-center gap-2 flex-1 text-center"
+              >
+                <FaTrash /> 削除
+              </Link>
+              
               <button
                 type="submit"
                 disabled={isSaving}
-                className="bg-purple-600 hover:bg-purple-700 text-white py-3 px-6 rounded-md flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-purple-600 hover:bg-purple-700 text-white py-3 px-6 rounded-md flex items-center justify-center gap-2 flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSaving ? (
                   <>
@@ -404,7 +405,7 @@ export function QuestEditForm({ quest, questId, onQuestUpdated, onError }: Quest
                   </>
                 ) : (
                   <>
-                    <FaSave /> 変更を保存
+                    <FaSave /> 更新
                   </>
                 )}
               </button>

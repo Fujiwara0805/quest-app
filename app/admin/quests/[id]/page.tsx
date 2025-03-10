@@ -109,7 +109,7 @@ export default function QuestEditPage({ params }: { params: { id: string } }) {
               className="flex items-center text-[#E8D4B9] hover:text-white transition-colors"
             >
               <FaArrowLeft className="mr-2" />
-              <span>クエスト一覧に戻る</span>
+              <span>戻る</span>
             </Link>
           </div>
         </div>

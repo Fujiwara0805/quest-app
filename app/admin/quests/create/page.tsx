@@ -121,16 +121,6 @@ export default function CreateQuestPage() {
 
   return (
     <div>
-      <div className="mb-6">
-        <Link
-          href="/admin/quests"
-          className="text-purple-400 hover:text-purple-300 flex items-center gap-2 mb-2"
-        >
-          <FaArrowLeft /> クエスト一覧に戻る
-        </Link>
-        <h1 className="text-3xl font-bold text-white">クエスト作成</h1>
-      </div>
-      
       <PageHeader title="クエスト作成画面" />
       <div className="max-w-3xl mx-auto p-4">
         
