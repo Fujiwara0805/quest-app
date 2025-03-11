@@ -51,9 +51,9 @@ export default function QuestsListPage() {
   }
 
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       <PageHeader title="クエスト一覧画面" />
-      <div className="flex flex-col h-screen container mx-auto px-4 py-4 flex-1 overflow-y-auto">
+      <div className="container mx-auto px-4 py-4 flex-grow">
         {/* ヘッダーとの間に余白を追加 */}
         <div className="mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
           <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
@@ -67,7 +67,10 @@ export default function QuestsListPage() {
         </div>
         
         <QuestsList quests={quests} searchTerm={searchTerm} />
+        
+        {/* 下部に余白を追加してスクロール時の見切れを防止 */}
+        <div className="h-16"></div>
       </div>
-    </>
+    </div>
   );
 }
