@@ -31,7 +31,7 @@ export default function AdminDashboardPage() {
   return (
     <div>
       <PageHeader title="ダッシュボード画面" />
-      <div className="container mx-auto px-4 py-8">
+      <div className="container flex-col h-screen mx-auto px-4 py-8">
         <DashboardContent recentQuests={recentQuests} isLoading={isLoading} />
       </div>
     </div>
