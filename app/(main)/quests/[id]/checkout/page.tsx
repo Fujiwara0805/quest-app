@@ -1,4 +1,4 @@
-import { getQuests } from "@/app/data/quests";
+import { getQuests, getQuestById } from "@/app/data/quests";
 import { PurchaseForm } from "./components/PurchaseForm";
 import { Quest } from "@/lib/types/quest";
 
@@ -15,13 +15,17 @@ export async function generateStaticParams() {
   }
 }
 
+// キャッシュを無効化して常に最新データを取得
+export const dynamic = 'force-dynamic';
+
 export default async function CheckoutPage({ params }: { params: { id: string } }) {
-  // クエストデータを取得
-  let quest: Quest | undefined;
+  // getQuests()の代わりにgetQuestById()を使用して直接IDでクエストを取得
+  let quest: Quest | null = null;
   
   try {
-    const quests = await getQuests();
-    quest = quests.find(q => String(q.id).trim().toLowerCase() === String(params.id).trim().toLowerCase());
+    // IDを直接使用してクエストを取得（getQuests関数の発火を回避）
+    quest = await getQuestById(params.id);
+    console.log('取得したクエスト:', quest?.title);
   } catch (error) {
     console.error('クエスト取得エラー:', error);
   }
