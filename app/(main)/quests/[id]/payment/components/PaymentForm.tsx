@@ -1,14 +1,16 @@
 "use client";
 
-import { useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { ChevronLeft, CreditCard, QrCode } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { Quest } from "@/lib/types/quest";
+import { ChevronLeft, CreditCard, QrCode } from 'lucide-react';
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
 interface PaymentFormProps {
-  questId: string;
+  quest: Quest;
+  userId: string;
 }
 
 type PaymentMethod = 'card' | 'qr';
@@ -20,167 +22,122 @@ interface CardInfo {
   name: string;
 }
 
-export function PaymentForm({ questId }: PaymentFormProps) {
+export function PaymentForm({ quest, userId }: PaymentFormProps) {
+  const stripe = useStripe();
+  const elements = useElements();
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const [isLoading, setIsLoading] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('card');
-  const [cardInfo, setCardInfo] = useState<CardInfo>({
-    number: '',
-    expiry: '',
-    cvc: '',
-    name: ''
-  });
-  const [quest, setQuest] = useState<Quest | null>(null);
+  
   const [error, setError] = useState<string | null>(null);
-
-  // URLパラメータから予約情報を取得
-  const date = searchParams.get('date');
-  const time = searchParams.get('time');
-  const quantity = searchParams.get('quantity');
-
-  // クエストデータを取得
+  const [processing, setProcessing] = useState(false);
+  const [succeeded, setSucceeded] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('card');
+  
+  // 購入枚数の状態（チェックアウト画面から渡される値を使用）
+  const [quantity, setQuantity] = useState(1); // デフォルト値は1
+  
+  // URLからクエリパラメータを取得
   useEffect(() => {
-    async function fetchQuest() {
-      try {
-        // 一時的なモックデータを使用
-        const mockQuest: Quest = {
-          id: questId,
-          title: "サンプルクエスト",
-          description: "これはサンプルクエストの説明です",
-          difficulty: "★★",
-          date: new Date(),
-          startTime: "10:00",
-          location: {
-            address: "東京都渋谷区",
-            access: "渋谷駅から徒歩10分"
-          },
-          tickets: {
-            available: 20,
-            price: 3500
-          },
-          image: "https://placehold.co/600x400?text=Sample+Quest",
-          reward: {
-            cardNumber: "No.001",
-            cardName: "サンプルカード"
-          },
-          reviews: {
-            rating: 4.5,
-            count: 10,
-            comments: []
-          }
-        };
-        
-        setQuest(mockQuest);
-      } catch (error) {
-        console.error('クエスト取得エラー:', error);
-        setError('クエスト情報の取得に失敗しました');
+    // URLからクエリパラメータを取得
+    const params = new URLSearchParams(window.location.search);
+    const qty = params.get('quantity');
+    
+    // 数量が指定されていれば状態を更新
+    if (qty && !isNaN(Number(qty))) {
+      setQuantity(Number(qty));
+    }
+  }, []);
+  
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!stripe || !elements) {
+      // Stripeがまだロードされていない
+      return;
+    }
+    
+    setProcessing(true);
+    
+    try {
+      // 支払い意図を作成
+      const response = await fetch('/api/create-payment-intent', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          questId: quest.id,
+          amount: totalAmount,
+          userId: userId,
+          quantity: quantity
+        }),
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || '支払い処理中にエラーが発生しました');
       }
+      
+      // カード情報を使用して支払いを確定
+      const cardElement = elements.getElement(CardElement);
+      
+      if (!cardElement) {
+        throw new Error('カード情報が見つかりません');
+      }
+      
+      const { error, paymentIntent } = await stripe.confirmCardPayment(data.clientSecret, {
+        payment_method: {
+          card: cardElement,
+          billing_details: {
+            name: userId,
+          },
+        },
+      });
+      
+      if (error) {
+        throw new Error(error.message || '支払い処理中にエラーが発生しました');
+      }
+      
+      if (paymentIntent.status === 'succeeded') {
+        setSucceeded(true);
+        
+        // 予約情報を保存
+        await fetch('/api/reservations', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            questId: quest.id,
+            userId: userId,
+            paymentIntentId: paymentIntent.id,
+            amount: totalAmount,
+            quantity: quantity
+          }),
+        });
+        
+        // 予約完了ページに遷移
+        router.push('/reservations');
+      }
+    } catch (err: any) {
+      setError(err.message || '支払い処理中にエラーが発生しました');
+    } finally {
+      setProcessing(false);
     }
-    
-    fetchQuest();
-  }, [questId]);
-
-  // カード情報が全て入力されているかチェック
-  const isCardInfoComplete = paymentMethod === 'qr' || (
-    cardInfo.number.length >= 16 &&
-    cardInfo.expiry.length === 5 &&
-    cardInfo.cvc.length >= 3 &&
-    cardInfo.name.length > 0
-  );
-
-  // 予約情報がない場合は購入画面に戻る
-  useEffect(() => {
-    // デバッグ情報を追加
-    console.log('PaymentForm useEffect - URL Params:', { date, time, quantity });
-    
-    // リダイレクト条件を一時的に無効化
-    // if (!date || !time || !quantity) {
-    //   router.push(`/quests/${questId}`);
-    // }
-  }, [date, time, quantity, questId, router]);
-
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#3a2820]">
-        <div className="text-white text-center">
-          <h1 className="text-2xl font-bold mb-4">エラー: {error}</h1>
-          <a href="/" className="inline-block bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg">
-            クエスト一覧に戻る
-          </a>
-        </div>
-      </div>
-    );
-  }
-
-  if (!quest) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#3a2820]">
-        <div className="text-white text-center">
-          <h1 className="text-2xl font-bold mb-4">読み込み中...</h1>
-        </div>
-      </div>
-    );
-  }
-
-  const handlePayment = async () => {
-    if (!isCardInfoComplete) return;
-    
-    setIsLoading(true);
-    // TODO: 実際の支払い処理を実装
-    await new Promise(resolve => setTimeout(resolve, 2000)); // 支払い処理のシミュレーション
-    router.push(`/quests/${questId}/payment/complete`);
   };
-
-  // カード情報の更新
-  const handleCardInfoChange = (field: keyof CardInfo, value: string) => {
-    let formattedValue = value;
-
-    // カード番号のフォーマット (4桁ごとにスペース)
-    if (field === 'number') {
-      formattedValue = value.replace(/\s/g, '').replace(/(\d{4})/g, '$1 ').trim();
-      if (formattedValue.length > 19) return; // 16桁 + 3スペース
-    }
-
-    // 有効期限のフォーマット (MM/YY)
-    if (field === 'expiry') {
-      formattedValue = value
-        .replace(/\D/g, '')
-        .replace(/^(\d{2})/, '$1/')
-        .substring(0, 5);
-    }
-
-    // セキュリティコードは数字のみ、最大4桁
-    if (field === 'cvc') {
-      formattedValue = value.replace(/\D/g, '').substring(0, 4);
-    }
-
-    setCardInfo(prev => ({
-      ...prev,
-      [field]: formattedValue
-    }));
-  };
-
-  // 日付をフォーマット
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('ja-JP', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      weekday: 'long'
-    });
-  };
-
+  
+  // 金額計算（単価 × 枚数）
+  const totalAmount = (quest.tickets.price || 0) * quantity;
+  
   return (
-    <div className="min-h-screen bg-[url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b')] bg-cover bg-center">
+    <div className="min-h-screen bg-[url('/images/background.jpeg')] bg-cover bg-center">
       <div className="min-h-screen bg-gradient-to-b from-black/30 via-black/20 to-black/40">
         {/* 装飾的な要素 */}
         <div className="absolute inset-0 bg-[url('/patterns/noise.png')] opacity-5 pointer-events-none" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#2a1810]/40 to-transparent pointer-events-none" />
 
-        {/* ヘッダー */}
-        <div className="sticky top-0 z-50 bg-[#463C2D]/95 backdrop-blur border-b border-[#C0A172]">
+        {/* ヘッダー - 固定 */}
+        <div className="fixed top-0 left-0 right-0 z-50 bg-[#463C2D]/95 backdrop-blur border-b border-[#C0A172]">
           <div className="container mx-auto px-4 py-4">
             <button
               onClick={() => router.back()}
@@ -192,7 +149,8 @@ export function PaymentForm({ questId }: PaymentFormProps) {
           </div>
         </div>
 
-        <main className="container mx-auto px-4 py-6 max-w-2xl">
+        {/* メインコンテンツ - ヘッダーとの間隔を開ける */}
+        <main className="container mx-auto px-4 py-6 max-w-2xl pt-12">
           <div className="bg-[#463C2D]/80 backdrop-blur rounded-lg border border-[#C0A172] overflow-hidden">
             {/* 予約内容確認 */}
             <div className="p-6 space-y-6">
@@ -204,8 +162,10 @@ export function PaymentForm({ questId }: PaymentFormProps) {
                 </div>
                 <div>
                   <h3 className="font-medium mb-2">予約日時</h3>
-                  <p>{date && formatDate(date)}</p>
-                  <p>{time}</p>
+                  <p>{quest.date instanceof Date 
+                    ? quest.date.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' }) 
+                    : new Date(quest.date).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' })}</p>
+                  <p>{quest.startTime || '時間未設定'}</p>
                 </div>
                 <div>
                   <h3 className="font-medium mb-2">購入枚数</h3>
@@ -214,7 +174,10 @@ export function PaymentForm({ questId }: PaymentFormProps) {
                 <div>
                   <h3 className="font-medium mb-2">合計金額</h3>
                   <p className="text-xl font-bold">
-                    ¥{(quest.tickets.price * (parseInt(quantity || '0'))).toLocaleString()}
+                    ¥{totalAmount.toLocaleString()}
+                  </p>
+                  <p className="text-sm text-gray-300">
+                    (¥{(quest.tickets.price || 0).toLocaleString()} × {quantity}枚)
                   </p>
                 </div>
               </div>
@@ -229,7 +192,7 @@ export function PaymentForm({ questId }: PaymentFormProps) {
                       name="payment"
                       value="card"
                       checked={paymentMethod === 'card'}
-                      onChange={(e) => setPaymentMethod('card')}
+                      onChange={() => setPaymentMethod('card')}
                       className="w-4 h-4 text-purple-600 bg-[#5C4D3C]/50 border-[#C0A172]"
                     />
                     <div className="flex items-center space-x-2 text-white">
@@ -243,7 +206,7 @@ export function PaymentForm({ questId }: PaymentFormProps) {
                       name="payment"
                       value="qr"
                       checked={paymentMethod === 'qr'}
-                      onChange={(e) => setPaymentMethod('qr')}
+                      onChange={() => setPaymentMethod('qr')}
                       className="w-4 h-4 text-purple-600 bg-[#5C4D3C]/50 border-[#C0A172]"
                     />
                     <div className="flex items-center space-x-2 text-white">
@@ -254,8 +217,8 @@ export function PaymentForm({ questId }: PaymentFormProps) {
                 </div>
               </div>
 
-              {/* クレジットカード情報フォーム */}
-              {paymentMethod === 'card' && (
+              {/* 支払い方法に応じたフォーム表示 */}
+              {paymentMethod === 'card' ? (
                 <div className="border-t border-[#C0A172]/20 pt-6">
                   <div className="flex items-center gap-2 mb-4">
                     <CreditCard className="w-5 h-5 text-white" />
@@ -266,8 +229,8 @@ export function PaymentForm({ questId }: PaymentFormProps) {
                       <Label htmlFor="cardNumber" className="text-white">カード番号</Label>
                       <Input
                         id="cardNumber"
-                        value={cardInfo.number}
-                        onChange={(e) => handleCardInfoChange('number', e.target.value)}
+                        value={''}
+                        onChange={(e) => {}}
                         placeholder="1234 5678 9012 3456"
                         className="bg-[#5C4D3C]/50 border-[#C0A172] text-white placeholder:text-white/50"
                       />
@@ -277,8 +240,8 @@ export function PaymentForm({ questId }: PaymentFormProps) {
                         <Label htmlFor="expiry" className="text-white">有効期限</Label>
                         <Input
                           id="expiry"
-                          value={cardInfo.expiry}
-                          onChange={(e) => handleCardInfoChange('expiry', e.target.value)}
+                          value={''}
+                          onChange={(e) => {}}
                           placeholder="MM/YY"
                           className="bg-[#5C4D3C]/50 border-[#C0A172] text-white placeholder:text-white/50"
                         />
@@ -287,8 +250,8 @@ export function PaymentForm({ questId }: PaymentFormProps) {
                         <Label htmlFor="cvc" className="text-white">セキュリティコード</Label>
                         <Input
                           id="cvc"
-                          value={cardInfo.cvc}
-                          onChange={(e) => handleCardInfoChange('cvc', e.target.value)}
+                          value={''}
+                          onChange={(e) => {}}
                           placeholder="123"
                           className="bg-[#5C4D3C]/50 border-[#C0A172] text-white placeholder:text-white/50"
                         />
@@ -298,49 +261,52 @@ export function PaymentForm({ questId }: PaymentFormProps) {
                       <Label htmlFor="name" className="text-white">カード名義人</Label>
                       <Input
                         id="name"
-                        value={cardInfo.name}
-                        onChange={(e) => handleCardInfoChange('name', e.target.value)}
+                        value={''}
+                        onChange={(e) => {}}
                         placeholder="TARO YAMADA"
                         className="bg-[#5C4D3C]/50 border-[#C0A172] text-white placeholder:text-white/50"
                       />
                     </div>
                   </div>
                 </div>
-              )}
-
-              {/* QRコード決済の場合 */}
-              {paymentMethod === 'qr' && (
+              ) : (
                 <div className="border-t border-[#C0A172]/20 pt-6">
-                  <div className="text-center text-white">
-                    <p className="mb-4">QRコード決済は現在準備中です。</p>
-                    <p className="text-sm text-white/70">
-                      クレジットカード決済をご利用ください。
+                  <div className="flex items-center gap-2 mb-4">
+                    <QrCode className="w-5 h-5 text-white" />
+                    <h2 className="text-lg font-bold text-white">QRコード決済</h2>
+                  </div>
+                  <div className="bg-white p-6 rounded-lg flex flex-col items-center">
+                    <div className="w-48 h-48 bg-gray-200 flex items-center justify-center mb-4">
+                      <QrCode className="w-24 h-24 text-gray-500" />
+                    </div>
+                    <p className="text-center text-gray-700">
+                      このQRコードをスキャンして決済を完了してください
                     </p>
                   </div>
                 </div>
               )}
+              
+              {/* エラーメッセージ表示 */}
+              {error && (
+                <div className="mt-4 p-3 bg-red-500/20 border border-red-500 rounded-md">
+                  <p className="text-white">{error}</p>
+                </div>
+              )}
             </div>
+            
             {/* フッター */}
             <div className="p-4 bg-[#463C2D]/95 backdrop-blur border-t border-[#C0A172]">
               <div className="flex gap-4">
                 <button
-                  onClick={() => router.back()}
-                  className="flex-1 py-3 text-white font-medium rounded-lg
-                    border-2 border-[#C0A172] bg-transparent
-                    hover:bg-[#5C4D3C] transition-colors"
-                >
-                  戻る
-                </button>
-                <button
-                  onClick={handlePayment}
-                  disabled={!isCardInfoComplete || isLoading}
-                  className={`flex-1 py-3 text-white font-medium rounded-lg transition-all duration-300
-                    ${isCardInfoComplete && !isLoading
-                      ? 'bg-purple-600 hover:bg-purple-700 transform hover:scale-[1.02]'
-                      : 'bg-gray-500 cursor-not-allowed'
+                  onClick={handleSubmit}
+                  disabled={!stripe || processing || succeeded}
+                  className={`mt-2 w-full py-3 text-white font-medium rounded-lg transition-all duration-300
+                    ${(!stripe || processing || succeeded)
+                      ? 'bg-gray-500 cursor-not-allowed'
+                      : 'bg-purple-600 hover:bg-purple-700 transform hover:scale-[1.02]'
                     }`}
                 >
-                  {isLoading ? "処理中..." : "支払いを確定する"}
+                  {processing ? "処理中..." : "支払いを完了する"}
                 </button>
               </div>
             </div>

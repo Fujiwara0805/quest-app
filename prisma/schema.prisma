@@ -53,6 +53,7 @@ model User {
   stripeCurrentPeriodEnd DateTime? @map("stripe_current_period_end")
   tickets       Ticket[]
   payments      Payment[]
+  reservations Reservation[]
 }
 
 model VerificationToken {
@@ -84,6 +85,7 @@ model Quest {
   cards            Card[]
   tickets          Ticket[]
   payments         Payment[]
+  reservations     Reservation[]
 
   @@map("quests")
 }
@@ -132,4 +134,19 @@ model Ticket {
   user    User    @relation(fields: [userId], references: [id])
   quest   Quest   @relation(fields: [questId], references: [id])
   payment Payment @relation(fields: [paymentId], references: [id])
+}
+
+model Reservation {
+  id              String   @id @default(uuid())
+  questId         String
+  userId          String
+  paymentIntentId String   @unique
+  amount          Int
+  status          String   // 'confirmed', 'cancelled', etc.
+  reservedAt      DateTime @default(now())
+  quest           Quest    @relation(fields: [questId], references: [id])
+  user            User     @relation(fields: [userId], references: [id])
+
+  @@index([questId])
+  @@index([userId])
 }

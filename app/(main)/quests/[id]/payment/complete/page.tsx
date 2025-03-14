@@ -7,7 +7,7 @@ export default function PaymentCompletePage() {
   const router = useRouter();
 
   return (
-    <div className="min-h-screen bg-[url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b')] bg-cover bg-center">
+    <div className="min-h-screen bg-[url('/images/background.jpeg')] bg-cover bg-center">
       <div className="min-h-screen bg-gradient-to-b from-black/30 via-black/20 to-black/40 flex items-center justify-center">
         <div className="container mx-auto px-4 max-w-md">
           <div className="bg-[#463C2D]/80 backdrop-blur rounded-lg p-6 text-center space-y-6 border border-[#C0A172]">
