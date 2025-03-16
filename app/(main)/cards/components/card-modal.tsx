@@ -1,7 +1,7 @@
 "use client";
 
 import { X } from 'lucide-react';
-import { Card } from '@/types/card';
+import { Card } from '@/lib/types/card';
 
 interface CardModalProps {
   card: Card;
