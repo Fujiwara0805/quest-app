@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from 'react';
-import { Card } from '@/types/card';
+import { Card } from '@/lib/types/card';
 
 export function useCards() {
   // 獲得済みのカードデータ（仮にNo.001のみ）
