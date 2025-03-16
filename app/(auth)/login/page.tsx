@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { signIn, useSession } from 'next-auth/react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { FaGoogle, FaEnvelope, FaLock, FaUserPlus, FaSpinner, FaUserShield, FaUser } from 'react-icons/fa';
 
-export default function LoginPage() {
-  const searchParams = useSearchParams();
+// SearchParamsを使用するコンポーネント
+function LoginForm() {
   const router = useRouter();
   const { data: session, status } = useSession();
   const [email, setEmail] = useState('');
@@ -15,7 +15,11 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [isGoogleLoading, setIsGoogleLoading] = useState<boolean>(false);
   const [isAdminLogin, setIsAdminLogin] = useState<boolean>(false);
-
+  
+  // useSearchParamsを使用
+  const searchParams = useSearchParams();
+  const errorFromUrl = searchParams.get('error');
+  
   // 既にログインしている場合はリダイレクト
   useEffect(() => {
     if (status === 'authenticated') {
@@ -27,9 +31,6 @@ export default function LoginPage() {
     }
   }, [status, session, router]);
 
-  // エラーメッセージがURLに含まれている場合は表示
-  const errorFromUrl = searchParams.get('error');
-  
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -228,5 +229,13 @@ export default function LoginPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LoginForm />
+    </Suspense>
   );
 }

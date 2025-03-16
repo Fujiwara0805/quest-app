@@ -3,6 +3,9 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/db';
 
+// 動的レンダリングを強制
+export const dynamic = 'force-dynamic';
+
 // クエスト一覧取得
 export async function GET(req: NextRequest) {
   try {
