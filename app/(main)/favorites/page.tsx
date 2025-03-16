@@ -20,7 +20,7 @@ export default function FavoritesPage() {
       try {
         setIsLoading(true);
         const allQuests = await getQuests();
-        const filteredQuests = allQuests.filter(quest => favorites.includes(quest.id));
+        const filteredQuests = allQuests.filter(quest => favorites.includes(quest.id.toString()));
         setFavoriteQuests(filteredQuests);
       } catch (error) {
         console.error('お気に入りクエスト取得エラー:', error);
