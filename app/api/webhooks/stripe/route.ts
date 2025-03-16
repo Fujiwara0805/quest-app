@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { stripe } from '@/lib/stripe';
-import { prisma } from '@/lib/prisma';
+import stripe from '@/lib/stripe';
+import { db } from '@/lib/db';
 
 export async function POST(request: Request) {
   const body = await request.text();
@@ -29,13 +29,13 @@ export async function POST(request: Request) {
     const { questId, userId } = paymentIntent.metadata;
     
     // 既存の予約を確認
-    const existingReservation = await prisma.reservation.findUnique({
+    const existingReservation = await db.reservation.findUnique({
       where: { paymentIntentId: paymentIntent.id },
     });
     
     // 予約が存在しない場合は作成
     if (!existingReservation) {
-      await prisma.reservation.create({
+      await db.reservation.create({
         data: {
           questId,
           userId,
