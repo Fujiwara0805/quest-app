@@ -10,6 +10,7 @@ import { useLocation } from '../../lib/hooks/useLocation';
 import { useFavorites } from '../../lib/hooks/useFavorites';
 import QuestList from './QuestList';
 import { SortType } from '@/lib/constants/sort-options';
+import { BackgroundImage } from '@/components/ui/BackgroundImage';
 
 export default function QuestListContainer() {
   const router = useRouter();
@@ -42,18 +43,18 @@ export default function QuestListContainer() {
   // ローディング状態の表示
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[url('/images/background.png')] bg-cover bg-center flex items-center justify-center">
-        <div className="text-white text-xl">読み込み中...</div>
-      </div>
+      <BackgroundImage>
+        <div className="text-white text-xl text-center">読み込み中...</div>
+      </BackgroundImage>
     );
   }
 
   // エラー状態の表示
   if (error) {
     return (
-      <div className="min-h-screen bg-[url('/images/background.png')] bg-cover bg-center flex items-center justify-center">
-        <div className="text-white text-xl">エラーが発生しました: {error.message}</div>
-      </div>
+      <BackgroundImage>
+        <div className="text-white text-xl text-center">エラーが発生しました: {error.message}</div>
+      </BackgroundImage>
     );
   }
 
@@ -92,7 +93,7 @@ export default function QuestListContainer() {
     });
 
   return (
-    <div className="min-h-screen bg-[url('/images/background.png')] bg-cover bg-center">
+    <BackgroundImage>
       <div className="min-h-screen bg-gradient-to-b from-black/30 via-black/20 to-black/40">
         {/* 装飾的な要素 */}
         <div className="absolute inset-0 bg-[url('/images/noise.png')] opacity-5 pointer-events-none" />
@@ -128,6 +129,6 @@ export default function QuestListContainer() {
           <BottomNavigation onFavoritesToggle={setShowFavorites} showFavorites={showFavorites} />
         </div>
       </div>
-    </div>
+    </BackgroundImage>
   );
 } 
