@@ -1,10 +1,5 @@
 "use client";
 
-import { useMemo, useState } from 'react';
-import { CheckCircle, Clock, QrCode, X } from 'lucide-react';
-import { QRCodeModal } from './qr-code-modal';
-import { useReservations } from '../hooks/useReservations';
-import { Reservation } from '../hooks/useReservations';
 import { Reservation as PrismaReservation, Quest } from '@prisma/client';
 import Link from 'next/link';
 

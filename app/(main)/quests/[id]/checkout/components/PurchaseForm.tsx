@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { BackgroundImage } from '@/components/ui/BackgroundImage';
 
 interface PurchaseFormProps {
   quest: Quest;
@@ -71,7 +72,7 @@ export function PurchaseForm({ quest }: PurchaseFormProps) {
   };
 
   return (
-    <div className="min-h-screen bg-[url('/images/background.jpeg')] bg-cover bg-center">
+    <BackgroundImage>
       <div className="min-h-screen bg-gradient-to-b from-black/30 via-black/20 to-black/40">
         {/* 装飾的な要素 */}
         <div className="absolute inset-0 bg-[url('/patterns/noise.png')] opacity-5 pointer-events-none" />
@@ -212,6 +213,6 @@ export function PurchaseForm({ quest }: PurchaseFormProps) {
           </div>
         </main>
       </div>
-    </div>
+    </BackgroundImage>
   );
 }

@@ -1,5 +1,6 @@
 import React from 'react';
 import { MainNav } from './components/main-nav';
+import { BackgroundImage } from '@/components/ui/BackgroundImage';
 
 export default function MainLayout({
   children,
@@ -7,7 +8,7 @@ export default function MainLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-[url('/images/background.jpeg')] bg-cover bg-center">
+    <BackgroundImage>
       <div className="min-h-screen bg-gradient-to-b from-black/30 via-black/20 to-black/40">
         {/* 装飾的な要素 */}
         <div className="absolute inset-0 bg-[url('/patterns/noise.png')] opacity-5 pointer-events-none" />
@@ -17,6 +18,6 @@ export default function MainLayout({
         
         <MainNav />
       </div>
-    </div>
+    </BackgroundImage>
   );
 }

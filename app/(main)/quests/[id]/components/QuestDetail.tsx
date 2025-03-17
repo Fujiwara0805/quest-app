@@ -5,6 +5,7 @@ import { Clock, MapPin, Users, Trophy, Star } from 'lucide-react';
 import { Share2 } from 'lucide-react';
 import { Quest } from '@/lib/types/quest';
 import { FavoriteButton } from '@/components/quests/FavoriteButton';
+import { BackgroundImage } from '@/components/ui/BackgroundImage';
 
 interface QuestDetailProps {
   quest: Quest;
@@ -37,7 +38,7 @@ export function QuestDetail({ quest }: QuestDetailProps) {
   };
 
   return (
-    <div className="min-h-screen bg-[url('/images/background.jpeg')] bg-cover bg-center">
+    <BackgroundImage>
       <div className="min-h-screen bg-gradient-to-b from-black/30 via-black/20 to-black/40">
         {/* 装飾的な要素 */}
         <div className="absolute inset-0 bg-[url('/patterns/noise.png')] opacity-5 pointer-events-none" />
@@ -213,6 +214,6 @@ export function QuestDetail({ quest }: QuestDetailProps) {
           </div>
         </div>
       </div>
-    </div>
+    </BackgroundImage>
   );
 }

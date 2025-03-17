@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react';
 import { QuestEditForm } from './components/QuestEditForm';
 import Link from 'next/link';
 import { FaArrowLeft } from 'react-icons/fa';
+import { BackgroundImage } from '@/components/ui/BackgroundImage';
 
 export default function QuestEditPage({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -95,7 +96,7 @@ export default function QuestEditPage({ params }: { params: { id: string } }) {
   }
 
   return (
-    <div className="min-h-screen bg-[url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b')] bg-cover bg-center">
+    <BackgroundImage>
       <div className="min-h-screen bg-gradient-to-b from-black/30 via-black/20 to-black/40">
         {/* 装飾的な要素 */}
         <div className="absolute inset-0 bg-[url('/patterns/noise.png')] opacity-5 pointer-events-none" />
@@ -139,6 +140,6 @@ export default function QuestEditPage({ params }: { params: { id: string } }) {
           )}
         </main>
       </div>
-    </div>
+    </BackgroundImage>
   );
 }
