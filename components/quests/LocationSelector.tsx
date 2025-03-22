@@ -1,6 +1,7 @@
 "use client";
 
 import { MapPin, ChevronDown, LogOut, Search } from 'lucide-react';
+import { signOut } from "next-auth/react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -37,8 +38,8 @@ export function LocationSelector({
 }: LocationSelectorProps) {
   const router = useRouter();
 
-  const handleLogout = () => {
-    router.push('/login');
+  const handleLogout = async () => {
+    await signOut({ callbackUrl: '/login' });
   };
 
   return (

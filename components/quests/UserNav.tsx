@@ -16,6 +16,10 @@ import { Button } from "@/components/ui/button";
 export function UserNav() {
   const { data: session, status } = useSession();
   
+  const handleLogout = async () => {
+    await signOut({ callbackUrl: '/login' });
+  };
+  
   if (status === "loading") {
     return (
       <Button variant="ghost" size="icon" className="w-8 h-8 rounded-full">
@@ -39,35 +43,31 @@ export function UserNav() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="relative w-8 h-8 rounded-full">
           <Avatar className="w-8 h-8 border border-[#C0A172]/50">
-            <AvatarImage src={session?.user?.image || ""} alt={session?.user?.name || ""} />
+            <AvatarImage 
+              src={session?.user?.image || ""} 
+              alt={session?.user?.name || "User"} 
+              className="object-cover"
+            />
             <AvatarFallback className="bg-[#5C4D3C] text-[#E8D4B9]">
               {session?.user?.name?.charAt(0) || "U"}
             </AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56 bg-[#463C2D] border border-[#C0A172] text-[#E8D4B9]" align="end" forceMount>
-        <DropdownMenuLabel className="font-normal">
-          <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium">{session?.user?.name}</p>
-            <p className="text-xs text-[#E8D4B9]/70 truncate">{session?.user?.email}</p>
-          </div>
+      <DropdownMenuContent className="w-56 bg-[#2A241B] border border-[#C0A172]/30 text-[#E8D4B9]" align="end">
+        <DropdownMenuLabel className="border-b border-[#C0A172]/20 pb-2">
+          {session?.user?.name || "ユーザー"}
         </DropdownMenuLabel>
-        <DropdownMenuSeparator className="bg-[#C0A172]/20" />
-        <DropdownMenuItem asChild>
-          <Link href="/profile" className="cursor-pointer hover:bg-[#5C4D3C]">
-            プロフィール
-          </Link>
+        <DropdownMenuItem className="py-2 hover:bg-[#463C2D] cursor-pointer">
+          <Link href="/profile" className="w-full">プロフィール</Link>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href="/reservations" className="cursor-pointer hover:bg-[#5C4D3C]">
-            予約管理
-          </Link>
+        <DropdownMenuItem className="py-2 hover:bg-[#463C2D] cursor-pointer">
+          <Link href="/reservations" className="w-full">予約履歴</Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator className="bg-[#C0A172]/20" />
         <DropdownMenuItem 
-          className="cursor-pointer hover:bg-[#5C4D3C]"
-          onClick={() => signOut({ callbackUrl: "/" })}
+          className="py-2 text-red-400 hover:bg-[#463C2D] cursor-pointer" 
+          onClick={handleLogout}
         >
           ログアウト
         </DropdownMenuItem>
