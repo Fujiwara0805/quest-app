@@ -16,14 +16,12 @@ export function formatDate(date: Date) {
   };
 }
 
-export function getDaysUntilEndOfMarch(): number {
+export function getDatesForFullYear(): number {
   const today = new Date();
-  const endOfMarch = new Date(today.getFullYear(), 2, 31);
+  const oneYearLater = new Date();
+  oneYearLater.setFullYear(today.getFullYear() + 1);
+  oneYearLater.setDate(today.getDate() - 1); // 丁度1年後の前日まで
   
-  if (today > endOfMarch) {
-    endOfMarch.setFullYear(today.getFullYear() + 1);
-  }
-  
-  const diffTime = endOfMarch.getTime() - today.getTime();
+  const diffTime = oneYearLater.getTime() - today.getTime();
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
 }
