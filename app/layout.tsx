@@ -10,7 +10,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'ISLAND(仮)',
+  title: 'QUEST LAND',
   description: 'あなたの冒険が地域を変える',
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
 };
