@@ -95,7 +95,7 @@ function LoginForm() {
       
       <div className="w-full max-w-md space-y-8 bg-[#463C2D]/90 backdrop-blur rounded-lg p-6 shadow-xl border border-[#C0A172]">
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-purple-400">ISLAND App</h2>
+          <h2 className="text-3xl font-bold text-purple-400">QUEST LANDへようこそ！</h2>
           <p className="mt-2 text-[#E8D4B9]/80">
             {isAdminLogin ? '管理者アカウントでログイン' : 'アカウントにログインしてください'}
           </p>

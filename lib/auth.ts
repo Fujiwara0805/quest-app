@@ -2,6 +2,7 @@ import { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { db } from "@/lib/db";
+import CredentialsProvider from "next-auth/providers/credentials";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(db),
@@ -16,6 +17,32 @@ export const authOptions: NextAuthOptions = {
           access_type: "offline",
           response_type: "code"
         }
+      }
+    }),
+    // テスト用のCredentials Provider
+    CredentialsProvider({
+      name: "テストアカウント",
+      credentials: {
+        email: { label: "メールアドレス", type: "email" },
+        password: { label: "パスワード", type: "password" }
+      },
+      async authorize(credentials) {
+        // テスト用アカウントの検証
+        if (
+          credentials?.email === "test@gmail.com" && 
+          credentials?.password === "2025"
+        ) {
+          // テスト用ユーザー情報を返す
+          return {
+            id: "test-user-id",
+            name: "テストユーザー",
+            email: "test@gmail.com",
+            role: "user"
+          };
+        }
+        
+        // 認証失敗
+        return null;
       }
     }),
   ],
@@ -80,14 +107,20 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id;
         
-        // ユーザーのロール情報を取得
-        const dbUser = await db.user.findUnique({
-          where: { email: user.email || "" },
-          select: { role: true }
-        });
-        
-        if (dbUser) {
-          token.role = dbUser.role;
+        // Credentialsプロバイダーでログインした場合、userオブジェクトから直接ロールを設定
+        if ('role' in user) {
+          token.role = (user as any).role;
+        } 
+        // それ以外の場合はデータベースからロール情報を取得
+        else {
+          const dbUser = await db.user.findUnique({
+            where: { email: user.email || "" },
+            select: { role: true }
+          });
+          
+          if (dbUser) {
+            token.role = dbUser.role;
+          }
         }
       }
       return token;
