@@ -38,8 +38,13 @@ export function LocationSelector({
 }: LocationSelectorProps) {
   const router = useRouter();
 
-  const handleLogout = async () => {
-    await signOut({ callbackUrl: '/login' });
+  const handleLogout =  () => {
+    try {
+      router.push('/login');
+    } catch (error) {
+      console.error('ログアウト中にエラーが発生しました:', error);
+      router.push('/login');
+    }
   };
 
   return (
