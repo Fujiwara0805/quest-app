@@ -8,7 +8,7 @@ export function BackgroundImage({ children }: BackgroundImageProps) {
   return (
     <div className="min-h-screen relative flex items-center justify-center">
       <Image
-        src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b"
+        src="https://res.cloudinary.com/dz9trbwma/image/upload/v1744171660/background_y6uzi5.jpg"
         alt="背景画像"
         fill
         priority
