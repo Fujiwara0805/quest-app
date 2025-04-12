@@ -4,7 +4,7 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   images: {
-    domains: ['images.unsplash.com', 'api.qrserver.com'],
+    domains: ['images.unsplash.com', 'api.qrserver.com', 'res.cloudinary.com'],
     remotePatterns: [
       {
         protocol: 'https',
