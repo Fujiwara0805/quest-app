@@ -16,6 +16,9 @@ function LoginForm() {
   const [isGoogleLoading, setIsGoogleLoading] = useState<boolean>(false);
   const [isAdminLogin, setIsAdminLogin] = useState<boolean>(false);
   
+  // 本番環境かどうかの判定
+  const isProduction = process.env.NODE_ENV === "production";
+  
   // useSearchParamsを使用
   const searchParams = useSearchParams();
   const errorFromUrl = searchParams.get('error');
@@ -23,7 +26,7 @@ function LoginForm() {
   // 既にログインしている場合はリダイレクト
   useEffect(() => {
     if (status === 'authenticated') {
-      if (session?.user?.role === 'admin') {
+      if (session?.user?.role === 'admin' || session?.user?.email === 'quest202412@gmail.com') {
         router.push('/admin/dashboard');
       } else {
         router.push('/quests');
@@ -46,7 +49,12 @@ function LoginForm() {
       if (result?.error) {
         setError('メールアドレスまたはパスワードが正しくありません');
       } else if (result?.ok) {
-        router.push('/quests');
+        // ログイン成功後、メールアドレスに基づいてリダイレクト
+        if (email === 'quest202412@gmail.com') {
+          router.push('/admin/dashboard');
+        } else {
+          router.push('/quests');
+        }
       }
     } catch (err) {
       setError('ログイン中にエラーが発生しました');
@@ -89,6 +97,23 @@ function LoginForm() {
     }
   };
   
+  // エラーメッセージを処理する関数
+  const getErrorMessage = () => {
+    if (error) return error;
+    if (!errorFromUrl) return null;
+    
+    if (errorFromUrl === 'Callback') {
+      return 'ログイン処理中にエラーが発生しました';
+    } else if (errorFromUrl === 'undefined' || errorFromUrl === 'null') {
+      return null; // undefinedやnullの文字列の場合は何も表示しない
+    } else {
+      return errorFromUrl;
+    }
+  };
+  
+  // 表示用のエラーメッセージ
+  const displayError = getErrorMessage();
+  
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-4 ">
       <div className="absolute inset-0 bg-[url('/patterns/noise.png')] opacity-5" />
@@ -101,9 +126,9 @@ function LoginForm() {
           </p>
         </div>
         
-        {(error || errorFromUrl) && (
+        {displayError && (
           <div className="bg-red-900/50 border border-red-500 text-red-200 px-4 py-3 rounded text-sm">
-            {error || (errorFromUrl === 'Callback' ? 'ログイン処理中にエラーが発生しました' : errorFromUrl)}
+            {displayError}
           </div>
         )}
 
@@ -213,17 +238,20 @@ function LoginForm() {
                 アカウントを新規作成
               </button>
               
-              <button
-                onClick={toggleAdminLogin}
-                className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-md transition ${
-                  isAdminLogin 
-                    ? 'bg-purple-900/60 hover:bg-purple-900 text-white' 
-                    : 'bg-[#2A241B]/60 hover:bg-[#2A241B] text-[#E8D4B9]'
-                }`}
-              >
-                <FaUserShield className={isAdminLogin ? "text-white" : "text-[#C0A172]"} />
-                {isAdminLogin ? '一般ユーザーログインに戻る' : '管理者ログイン'}
-              </button>
+              {/* 本番環境では管理者ログインボタンを表示しない */}
+              {!isProduction && (
+                <button
+                  onClick={toggleAdminLogin}
+                  className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-md transition ${
+                    isAdminLogin 
+                      ? 'bg-purple-900/60 hover:bg-purple-900 text-white' 
+                      : 'bg-[#2A241B]/60 hover:bg-[#2A241B] text-[#E8D4B9]'
+                  }`}
+                >
+                  <FaUserShield className={isAdminLogin ? "text-white" : "text-[#C0A172]"} />
+                  {isAdminLogin ? '一般ユーザーログインに戻る' : '管理者ログイン'}
+                </button>
+              )}
             </div>
           </>
         )}

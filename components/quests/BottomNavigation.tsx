@@ -47,10 +47,10 @@ export function BottomNavigation({ onFavoritesToggle, showFavorites }: BottomNav
         </button>
         <button 
           className="flex flex-col items-center space-y-1 text-[#E8D4B9]/50 hover:text-[#E8D4B9] transition-colors"
-          onClick={() => router.push('/cards')}
+          onClick={() => router.push('/')}
         >
           <CreditCard className="w-6 h-6" />
-          <span className="text-xs">カード</span>
+          <span className="text-xs">情報</span>
         </button>
         <button 
           className="flex flex-col items-center space-y-1 text-[#E8D4B9]/50 hover:text-[#E8D4B9] transition-colors"

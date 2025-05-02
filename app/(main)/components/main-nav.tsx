@@ -40,13 +40,13 @@ export function MainNav() {
           <span className="text-xs">予約管理</span>
         </button>
         <button 
-          onClick={() => router.push('/cards')}
+          onClick={() => router.push('/')}
           className={`flex flex-col items-center space-y-1 ${
-            isActive('/cards') ? 'text-[#E8D4B9]' : 'text-[#E8D4B9]/50 hover:text-[#E8D4B9]'
+            isActive('/') ? 'text-[#E8D4B9]' : 'text-[#E8D4B9]/50 hover:text-[#E8D4B9]'
           } transition-colors`}
         >
           <CreditCard className="w-6 h-6" />
-          <span className="text-xs">カード</span>
+          <span className="text-xs">情報</span>
         </button>
         <button 
           onClick={() => router.push('/profile')}

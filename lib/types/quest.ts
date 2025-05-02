@@ -13,10 +13,11 @@ export interface Quest {
     available: number;
     price?: number;
   };
-  reward: {
-    cardNumber?: string;
-    cardName: string;
-  };
+  // 削除予定
+  // reward: {
+  //   cardNumber?: string;
+  //   cardName: string;
+  // };
   image?: string;
   reviews?: {
     rating: number;
@@ -43,8 +44,9 @@ export interface QuestFormData {
   ticketPrice: number | null;
   imageUrl: string;
   imagePath: string;
-  rewardCardNumber: string;
-  rewardCardName: string;
+  // 削除予定
+  // rewardCardNumber: string;
+  // rewardCardName: string;
 }
 
 export interface QuestPreviewData {
@@ -61,9 +63,10 @@ export interface QuestPreviewData {
     available: number;
     price: number;
   };
-  reward: {
-    cardNumber: string;
-    cardName: string;
-  };
+  // 削除予定
+  // reward: {
+  //   cardNumber: string;
+  //   cardName: string;
+  // };
   image: string;
 }

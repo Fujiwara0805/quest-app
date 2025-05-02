@@ -123,10 +123,6 @@ export function QuestDetail({ quest }: QuestDetailProps) {
                     残り {quest.tickets.available}枚
                   </span>
                 </div>
-                <div className="flex items-center text-[#E8D4B9]">
-                  <Trophy className="w-5 h-5 mr-3 flex-shrink-0" />
-                  <span>{quest.reward.cardName}</span>
-                </div>
               </div>
             </div>
 
@@ -136,23 +132,6 @@ export function QuestDetail({ quest }: QuestDetailProps) {
               <p className="text-[#E8D4B9]/90 leading-relaxed text-sm sm:text-base">
                 {quest.description}
               </p>
-            </div>
-
-            {/* 報酬カード情報 */}
-            <div className="border-t border-[#C0A172]/20 pt-6">
-              <h2 className="text-lg font-medium text-[#E8D4B9] mb-3">報酬カード</h2>
-              <div className="bg-[#5C4D3C]/50 rounded-lg p-4 border border-[#C0A172]">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-[#E8D4B9]/80 text-sm">カード番号</p>
-                    <p className="text-lg font-bold text-purple-400">{quest.reward.cardNumber}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-[#E8D4B9]/80 text-sm">カード名</p>
-                    <p className="text-lg font-bold text-purple-400">{quest.reward.cardName}</p>
-                  </div>
-                </div>
-              </div>
             </div>
 
             {/* レビュー情報 */}
@@ -217,3 +196,4 @@ export function QuestDetail({ quest }: QuestDetailProps) {
     </BackgroundImage>
   );
 }
+

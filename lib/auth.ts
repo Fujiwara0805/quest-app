@@ -138,38 +138,17 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
     async redirect({ url, baseUrl }) {
-      // 管理者ユーザー（quest202412@gmail.com）の場合はクエスト作成画面に直接リダイレクト
-      // セッション情報からメールアドレスを取得できないため、URLパターンで判断
-      
       // コールバックURLの場合（ログイン直後）
       if (url.includes('/api/auth/callback/google') || url.includes('/api/auth/callback')) {
         try {
-          // セッショントークンからユーザー情報を取得できないため、
-          // URLのクエリパラメータからメールアドレスを取得する方法は使えない
-          
-          // 代わりに、最近ログインしたユーザーを確認
+          // 最近ログインしたユーザーを確認
           const recentSession = await db.session.findFirst({
             orderBy: { expires: 'desc' },
             include: { user: true },
           });
           
-          if (recentSession?.user?.email === "quest202412@gmail.com") {
+          if (recentSession?.user?.email === "quest202412@gmail.com" || recentSession?.user?.role === "admin") {
             return `${baseUrl}/admin/dashboard`;
-          }
-          
-          // または直接データベースからユーザーを確認
-          const adminUser = await db.user.findUnique({
-            where: { email: "quest202412@gmail.com" },
-            include: { sessions: { orderBy: { expires: 'desc' }, take: 1 } },
-          });
-          
-          // 最近のセッションがあれば管理者ページにリダイレクト
-          if (adminUser && adminUser.sessions.length > 0) {
-            const latestSession = adminUser.sessions[0];
-            const now = new Date();
-            if (latestSession.expires > now) {
-              return `${baseUrl}/admin/dashboard`;
-            }
           }
         } catch (error) {
           console.error("リダイレクト処理中にエラーが発生しました:", error);
@@ -179,8 +158,12 @@ export const authOptions: NextAuthOptions = {
       // callbackUrlが明示的に指定されている場合はそれを優先
       if (url.includes('callbackUrl=')) {
         const callbackUrl = new URL(url).searchParams.get('callbackUrl');
-        if (callbackUrl && callbackUrl.includes('/admin/dashboard')) {
-          return callbackUrl;
+        if (callbackUrl) {
+          // 管理者のためのダッシュボードチェック
+          if (callbackUrl.includes('/admin/dashboard')) {
+            return callbackUrl;
+          }
+          return callbackUrl.startsWith('/') ? `${baseUrl}${callbackUrl}` : callbackUrl;
         }
       }
       

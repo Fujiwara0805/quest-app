@@ -110,18 +110,6 @@ export function QuestCard({ quest }: QuestCardProps) {
             </div>
           </div>
 
-          {/* 報酬カード情報 */}
-          <div className="flex items-center justify-between pt-2 border-t border-white/20">
-            <div className="flex flex-col">
-              <span className="text-xs text-white/80">報酬カード</span>
-              <span className="text-sm font-medium text-purple-400">
-                {quest.reward.cardNumber}
-              </span>
-            </div>
-            <span className="text-sm font-medium text-purple-400">
-              {quest.reward.cardName}
-            </span>
-          </div>
         </div>
       </CardContent>
     </Card>
