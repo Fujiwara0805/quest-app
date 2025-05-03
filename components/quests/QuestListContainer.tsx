@@ -134,7 +134,7 @@ export default function QuestListContainer() {
 
   return (
     <BackgroundImage>
-      <div className="min-h-screen bg-gradient-to-b from-black/30 via-black/20 to-black/40">
+      <div className="min-h-screen max-h-screen flex flex-col bg-gradient-to-b from-black/30 via-black/20 to-black/40 overflow-hidden">
         {/* 装飾的な要素 */}
         <div className="absolute inset-0 bg-black/5 pointer-events-none" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#2a1810]/40 to-transparent pointer-events-none" />
@@ -155,7 +155,8 @@ export default function QuestListContainer() {
           )}
         </div>
         
-        <main className="pb-24">
+        {/* スクロール可能な固定高さのメインコンテンツエリア */}
+        <main className="flex-1 overflow-y-auto pb-24" style={{ height: 'calc(100vh - 180px)' }}>
           {/* 日付検索OFF + お気に入り表示OFF + 検索クエリなしの場合のみカテゴリー表示 */}
           {!dateSearchEnabled && !showFavorites && !searchQuery ? (
             renderCategorySection()
@@ -220,7 +221,7 @@ function CategorySection({ categoryName, quests }: { categoryName: string, quest
   }, [quests]);
 
   return (
-    <div className="px-4">
+    <div className="px-4 mb-6">
       <div className="flex items-center justify-between mb-3">
         <h2 className="text-white text-xl font-bold">{categoryName}</h2>
         {quests.length > 2 && (
@@ -254,7 +255,7 @@ function CategorySection({ categoryName, quests }: { categoryName: string, quest
       ) : (
         <div 
           ref={sliderRef}
-          className="flex overflow-x-auto pb-4 hide-scrollbar snap-x snap-mandatory"
+          className="flex overflow-x-auto pb-4 hide-scrollbar snap-x snap-mandatory max-h-[300px]"
           onScroll={checkScrollPosition}
           style={{ 
             scrollbarWidth: 'none',  /* Firefox */
