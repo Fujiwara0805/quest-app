@@ -40,25 +40,46 @@ function LoginForm() {
     setError('');
     
     try {
-      const result = await signIn('credentials', {
-        redirect: false,
-        email,
-        password,
-      });
-      
-      if (result?.error) {
-        setError('メールアドレスまたはパスワードが正しくありません');
-      } else if (result?.ok) {
-        // ログイン成功後、メールアドレスに基づいてリダイレクト
+      // 本番環境で redirect: true を使用して直接リダイレクトさせる
+      if (process.env.NODE_ENV === "production") {
+        // 管理者アカウントの場合
         if (email === 'quest202412@gmail.com') {
-          router.push('/admin/dashboard');
-        } else {
-          router.push('/quests');
+          await signIn('credentials', {
+            email,
+            password,
+            callbackUrl: '/admin/dashboard',
+          });
+        } 
+        // テストアカウントを含む一般ユーザーの場合
+        else {
+          await signIn('credentials', {
+            email,
+            password,
+            callbackUrl: '/quests',
+          });
+        }
+      }
+      // 開発環境ではこれまでどおりの処理
+      else {
+        const result = await signIn('credentials', {
+          redirect: false,
+          email,
+          password,
+        });
+        
+        if (result?.error) {
+          setError('メールアドレスまたはパスワードが正しくありません');
+        } else if (result?.ok) {
+          // ログイン成功後、メールアドレスに基づいてリダイレクト
+          if (email === 'quest202412@gmail.com') {
+            router.push('/admin/dashboard');
+          } else {
+            router.push('/quests');
+          }
         }
       }
     } catch (err) {
       setError('ログイン中にエラーが発生しました');
-    } finally {
       setLoading(false);
     }
   };
