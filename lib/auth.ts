@@ -50,6 +50,26 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60,
   },
+  cookies: {
+    sessionToken: {
+      name: `next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production"
+      }
+    },
+    callbackUrl: {
+      name: `next-auth.callback-url`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production"
+      }
+    },
+  },
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
     async signIn({ user, account, profile, email, credentials }) {
@@ -171,6 +191,23 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
     async redirect({ url, baseUrl }) {
+      // リダイレクト処理をシンプルに保ち、本番環境でも正しく動作するようにする
+      
+      // 認証コールバック（サインイン後）の場合は常にクエスト一覧に遷移
+      if (url.includes('/api/auth/callback/') || url.includes('/api/auth/signin/')) {
+        // 管理者の場合はダッシュボードへ
+        if (url.includes('/admin/dashboard')) {
+          return `${baseUrl}/admin/dashboard`;
+        }
+        // それ以外は全てクエスト一覧へ
+        return `${baseUrl}/quests`;
+      }
+      
+      // URLにクエスト一覧へのリダイレクトが含まれている場合
+      if (url.includes('/quests')) {
+        return `${baseUrl}/quests`;
+      }
+      
       // 管理者ダッシュボードの場合
       if (url.includes('/admin/dashboard')) {
         return `${baseUrl}/admin/dashboard`;
@@ -178,21 +215,25 @@ export const authOptions: NextAuthOptions = {
       
       // callbackUrlパラメータが含まれている場合
       if (url.includes('callbackUrl=')) {
-        const params = new URLSearchParams(url.split('?')[1]);
-        const callbackUrl = params.get('callbackUrl');
-        
-        if (callbackUrl) {
-          const decodedCallback = decodeURIComponent(callbackUrl);
-          return decodedCallback.startsWith('/') ? `${baseUrl}${decodedCallback}` : decodedCallback;
+        try {
+          const params = new URLSearchParams(url.split('?')[1]);
+          const callbackUrl = params.get('callbackUrl');
+          
+          if (callbackUrl) {
+            const decodedCallback = decodeURIComponent(callbackUrl);
+            // 安全なリダイレクト先かチェック
+            if (decodedCallback.startsWith('/')) {
+              return `${baseUrl}${decodedCallback}`;
+            }
+          }
+        } catch (error) {
+          console.error("コールバックURL解析エラー:", error);
+          // エラー時はデフォルトへ
+          return `${baseUrl}/quests`;
         }
       }
       
-      // URLがbaseUrlで始まる場合はそのまま使用
-      if (url.startsWith(baseUrl)) {
-        return url;
-      }
-      
-      // デフォルトのリダイレクト先
+      // デフォルトのリダイレクト先（常にクエスト一覧へ）
       return `${baseUrl}/quests`;
     }
   },
