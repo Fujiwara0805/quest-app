@@ -167,7 +167,10 @@ export default function QuestListContainer() {
                 クエストが見つかりませんでした
               </div>
             ) : (
-              <QuestList quests={filteredQuests} />
+              <QuestList 
+                quests={filteredQuests} 
+                dateSearchEnabled={dateSearchEnabled} 
+              />
             )
           )}
         </main>
@@ -277,7 +280,7 @@ function CategorySection({ categoryName, quests }: { categoryName: string, quest
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <QuestCard quest={quest} />
+              <QuestCard quest={quest} dateSearchEnabled={false} />
             </motion.div>
           ))}
         </div>

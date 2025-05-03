@@ -6,10 +6,11 @@ import { Quest } from '@/lib/types/quest';
 import { getQuestsByDate } from '@/app/data/quests';
 
 interface QuestListProps {
-  quests?: Quest[];
+  quests: Quest[];
+  dateSearchEnabled?: boolean;
 }
 
-export default function QuestList({ quests: propQuests }: QuestListProps) {
+export default function QuestList({ quests: propQuests, dateSearchEnabled = true }: QuestListProps) {
   // Supabaseからデータを取得（propsがない場合のみ）
   const [fetchedQuests, setFetchedQuests] = useState<Record<string, Quest[]>>({});
   const [loading, setLoading] = useState(!propQuests);
@@ -47,6 +48,7 @@ export default function QuestList({ quests: propQuests }: QuestListProps) {
             <QuestCard 
               key={quest.id} 
               quest={quest}
+              dateSearchEnabled={dateSearchEnabled}
             />
           ))
         )}
