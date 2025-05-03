@@ -6,6 +6,18 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { QuestPreview } from './QuestPreview';
 
+// ダミーカテゴリーのリスト
+const CATEGORIES = [
+  '伝統工芸品',
+  '農業体験',
+  '漁業体験',
+  '温泉体験',
+  '祭り・イベント',
+  '歴史体験',
+  '料理体験',
+  'その他'
+];
+
 interface QuestEditFormProps {
   quest: any;
   questId: string;
@@ -22,6 +34,7 @@ export function QuestEditForm({ quest, questId, onQuestUpdated, onError }: Quest
   const [date, setDate] = useState('');
   const [startTime, setStartTime] = useState('');
   const [difficulty, setDifficulty] = useState('★');
+  const [category, setCategory] = useState('');
   const [address, setAddress] = useState('');
   const [access, setAccess] = useState('');
   const [ticketsAvailable, setTicketsAvailable] = useState('');
@@ -29,8 +42,6 @@ export function QuestEditForm({ quest, questId, onQuestUpdated, onError }: Quest
   const [image, setImage] = useState<File | null>(null);
   const [currentImageUrl, setCurrentImageUrl] = useState('');
   const [imagePath, setImagePath] = useState('');
-  const [rewardCardNumber, setRewardCardNumber] = useState('');
-  const [rewardCardName, setRewardCardName] = useState('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   // クエストデータからフォームの初期値を設定
@@ -44,14 +55,13 @@ export function QuestEditForm({ quest, questId, onQuestUpdated, onError }: Quest
       }
       setStartTime(quest.startTime || '');
       setDifficulty(quest.difficulty || '★');
+      setCategory(quest.category || '');
       setAddress(quest.address || '');
       setAccess(quest.access || '');
       setTicketsAvailable(quest.ticketsAvailable?.toString() || '');
       setTicketPrice(quest.ticketPrice?.toString() || '');
       setCurrentImageUrl(quest.imageUrl || '');
       setImagePath(quest.imagePath || '');
-      setRewardCardNumber(quest.rewardCardNumber || '');
-      setRewardCardName(quest.rewardCardName || '');
     }
   }, [quest]);
 
@@ -112,6 +122,7 @@ export function QuestEditForm({ quest, questId, onQuestUpdated, onError }: Quest
         title,
         description,
         difficulty,
+        category,
         questDate: date ? new Date(date).toISOString() : null,
         startTime,
         address,
@@ -120,8 +131,6 @@ export function QuestEditForm({ quest, questId, onQuestUpdated, onError }: Quest
         ticketPrice: ticketPrice ? parseFloat(ticketPrice) : null,
         imageUrl,
         imagePath: updatedImagePath,
-        rewardCardNumber,
-        rewardCardName
       };
       
       const updateResponse = await fetch(`/api/admin/quests/${questId}`, {
@@ -161,6 +170,7 @@ export function QuestEditForm({ quest, questId, onQuestUpdated, onError }: Quest
     date: date ? new Date(date) : null,
     startTime,
     difficulty,
+    category,
     location: {
       address,
       access
@@ -169,19 +179,11 @@ export function QuestEditForm({ quest, questId, onQuestUpdated, onError }: Quest
       available: ticketsAvailable ? parseInt(ticketsAvailable) : 0,
       price: ticketPrice ? parseFloat(ticketPrice) : 0
     },
-    reward: {
-      cardNumber: rewardCardNumber,
-      cardName: rewardCardName
-    },
     image: imagePreview || currentImageUrl
   };
 
   return (
     <>
-      {/* <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-        <h1 className="text-3xl font-bold text-white">クエスト編集</h1>
-      </div> */}
-      
       <Card className="bg-[#463C2D]/80 backdrop-blur rounded-lg p-6 space-y-6 shadow-xl border border-[#C0A172]">
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -211,6 +213,21 @@ export function QuestEditForm({ quest, questId, onQuestUpdated, onError }: Quest
                     className="w-full bg-[#3a2820] border border-[#C0A172] p-3 rounded-md text-white"
                     placeholder="クエストの詳細説明を入力"
                   />
+                </div>
+                
+                <div>
+                  <label htmlFor="category" className="block text-[#E8D4B9] mb-2">カテゴリー</label>
+                  <select
+                    id="category"
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    className="w-full bg-[#3a2820] border border-[#C0A172] p-3 rounded-md text-white"
+                  >
+                    <option value="">カテゴリーを選択</option>
+                    {CATEGORIES.map((cat) => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                  </select>
                 </div>
                 
                 <div>
@@ -305,29 +322,7 @@ export function QuestEditForm({ quest, questId, onQuestUpdated, onError }: Quest
                   />
                 </div>
                 
-                <div>
-                  <label htmlFor="rewardCardNumber" className="block text-[#E8D4B9] mb-2">報酬カード番号</label>
-                  <input
-                    id="rewardCardNumber"
-                    type="text"
-                    value={rewardCardNumber}
-                    onChange={(e) => setRewardCardNumber(e.target.value)}
-                    className="w-full bg-[#3a2820] border border-[#C0A172] p-3 rounded-md text-white"
-                    placeholder="報酬カードの番号"
-                  />
-                </div>
-                
-                <div>
-                  <label htmlFor="rewardCardName" className="block text-[#E8D4B9] mb-2">報酬カード名</label>
-                  <input
-                    id="rewardCardName"
-                    type="text"
-                    value={rewardCardName}
-                    onChange={(e) => setRewardCardName(e.target.value)}
-                    className="w-full bg-[#3a2820] border border-[#C0A172] p-3 rounded-md text-white"
-                    placeholder="報酬カードの名称"
-                  />
-                </div>
+
               </div>
             </div>
             

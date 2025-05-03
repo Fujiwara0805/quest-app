@@ -4,8 +4,17 @@ import { useRouter } from 'next/navigation';
 import { useSession } from "next-auth/react";
 import { Card, CardContent } from '../../../../components/ui/card';
 import { PageHeader } from '@/app/(main)/components/page-header';
-import Link from 'next/link';
-import { FaArrowLeft } from 'react-icons/fa';
+
+// カテゴリーのリスト
+const CATEGORIES = [
+  '伝統工芸品',
+  '農業体験',
+  '漁業体験',
+  '温泉体験',
+  '祭り・イベント',
+  '歴史体験',
+  '料理体験'
+];
 
 // クエスト作成画面
 export default function CreateQuestPage() {
@@ -17,13 +26,12 @@ export default function CreateQuestPage() {
   const [date, setDate] = useState("");
   const [startTime, setStartTime] = useState("");
   const [difficulty, setDifficulty] = useState("★");
+  const [category, setCategory] = useState("");
   const [address, setAddress] = useState("");
   const [access, setAccess] = useState("");
   const [ticketsAvailable, setTicketsAvailable] = useState("");
   const [ticketPrice, setTicketPrice] = useState("");
   const [image, setImage] = useState<File | null>(null);
-  const [rewardCardNumber, setRewardCardNumber] = useState("");
-  const [rewardCardName, setRewardCardName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // 認証状態をチェック
@@ -83,6 +91,7 @@ export default function CreateQuestPage() {
         title,
         description,
         difficulty,
+        category,
         questDate: date ? new Date(date).toISOString() : null,
         startTime,
         address,
@@ -91,11 +100,9 @@ export default function CreateQuestPage() {
         ticketPrice: ticketPrice ? parseFloat(ticketPrice) : null,
         imageUrl,
         imagePath,
-        rewardCardNumber,
-        rewardCardName
       };
       
-      const response = await fetch('/api/quests', {
+      const response = await fetch('/api/admin/quests/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -147,6 +154,20 @@ export default function CreateQuestPage() {
                   className="w-full bg-[#3a2820] border border-[#C0A172] p-2 rounded-md text-white placeholder:text-gray-400 min-h-[100px]"
                   required
                 />
+              </div>
+              <div>
+                <label className="block mb-1 font-medium text-white">カテゴリー</label>
+                <select
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="w-full bg-[#3a2820] border border-[#C0A172] p-2 rounded-md text-white"
+                  required
+                >
+                  <option value="">カテゴリーを選択</option>
+                  {CATEGORIES.map((cat) => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -244,30 +265,6 @@ export default function CreateQuestPage() {
                              file:text-white file:bg-purple-600 file:hover:bg-purple-700"
                   required
                 />
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block mb-1 font-medium text-white">報酬カード番号</label>
-                  <input
-                    type="text"
-                    value={rewardCardNumber}
-                    onChange={(e) => setRewardCardNumber(e.target.value)}
-                    placeholder="例: No.001"
-                    className="w-full bg-[#3a2820] border border-[#C0A172] p-2 rounded-md text-white placeholder:text-gray-400"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block mb-1 font-medium text-white">報酬カード名</label>
-                  <input
-                    type="text"
-                    value={rewardCardName}
-                    onChange={(e) => setRewardCardName(e.target.value)}
-                    placeholder="カード名を入力"
-                    className="w-full bg-[#3a2820] border border-[#C0A172] p-2 rounded-md text-white placeholder:text-gray-400"
-                    required
-                  />
-                </div>
               </div>
               <div className="flex justify-center">
                 <button

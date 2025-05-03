@@ -1,4 +1,3 @@
-import { supabase } from '@/lib/supabase';
 import { Quest } from '../../lib/types/quest';
 
 // URLが有効かどうかを確認する関数
@@ -11,51 +10,53 @@ export function isValidUrl(url: string): boolean {
   }
 }
 
+// 完全なURLを生成する関数 - クライアントサイド対応
+function getBaseUrl() {
+  // クライアントサイドの場合
+  if (typeof window !== 'undefined') {
+    return window.location.origin;
+  }
+  
+  // サーバーサイドの場合は環境変数を使用
+  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+}
+
 // クエストデータを取得する関数
 export async function getQuests(): Promise<Quest[]> {
-  console.log('Fetching quests from Supabase...');
+  console.log('Fetching quests from API...');
   
-  const { data, error } = await supabase
-    .from('quests')
-    .select('*')
-    .order('created_at', { ascending: false });
+  try {
+    const baseUrl = getBaseUrl();
+    // 完全なURLを使用
+    const response = await fetch(`${baseUrl}/api/quests`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      cache: 'no-store' // SSRで毎回最新データを取得
+    });
     
-  if (error) {
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    const quests: Quest[] = data.quests || [];
+    
+    // 日付文字列をDateオブジェクトに変換
+    quests.forEach(quest => {
+      if (typeof quest.date === 'string') {
+        quest.date = new Date(quest.date);
+      }
+    });
+    
+    console.log('Fetched quests count:', quests.length);
+    
+    return quests;
+  } catch (error) {
     console.error('クエスト取得エラー:', error);
     return [];
   }
-  
-  // Supabaseから取得したデータをQuestインターフェースに変換
-  const quests: Quest[] = data.map(item => ({
-    id: item.id,
-    title: item.title,
-    description: item.description,
-    difficulty: item.difficulty || '★',
-    date: new Date(item.quest_date),
-    startTime: item.start_time,
-    location: {
-      address: item.address || '',
-      access: item.access || ''
-    },
-    tickets: {
-      available: item.tickets_available || 0,
-      price: item.ticket_price || 0
-    },
-    reward: {
-      cardNumber: item.reward_card_number || '',
-      cardName: item.reward_card_name || ''
-    },
-    image: item.image_url || '',
-    reviews: item.reviews || {
-      rating: 0,
-      count: 0,
-      comments: []
-    }
-  }));
-  
-  console.log('Fetched quests:', quests.map(item => ({ id: item.id, title: item.title })));
-  
-  return quests;
 }
 
 // 日付ごとにクエストを整理する関数
@@ -79,50 +80,46 @@ export async function getQuestsByDate(): Promise<Record<string, Quest[]>> {
 
 // IDに基づいて特定のクエストを取得
 export async function getQuestById(id: string): Promise<Quest | null> {
-  console.log('Fetching quest by ID from Supabase:', id);
+  console.log('Fetching quest by ID from API:', id);
   
-  const { data, error } = await supabase
-    .from('quests')
-    .select('*')
-    .eq('id', id)
-    .single();
+  try {
+    const baseUrl = getBaseUrl();
+    console.log('Using base URL:', baseUrl);
     
-  if (error) {
+    // 完全なURLを使用
+    const response = await fetch(`${baseUrl}/api/quests/${id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      cache: 'no-store' // SSRで毎回最新データを取得
+    });
+    
+    if (!response.ok) {
+      if (response.status === 404) {
+        console.log(`Quest with ID ${id} not found`);
+        return null;
+      }
+      throw new Error(`API error: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    const quest: Quest = data.quest;
+    
+    if (!quest) {
+      return null;
+    }
+    
+    // 日付文字列をDateオブジェクトに変換
+    if (typeof quest.date === 'string') {
+      quest.date = new Date(quest.date);
+    }
+    
+    console.log('Fetched quest:', { id: quest.id, title: quest.title });
+    
+    return quest;
+  } catch (error) {
     console.error(`ID: ${id} のクエスト取得エラー:`, error);
     return null;
   }
-  
-  if (!data) return null;
-  
-  // Supabaseから取得したデータをQuestインターフェースに変換
-  const quest: Quest = {
-    id: data.id,
-    title: data.title,
-    description: data.description,
-    difficulty: data.difficulty || '★',
-    date: new Date(data.quest_date),
-    startTime: data.start_time,
-    location: {
-      address: data.address || '',
-      access: data.access || ''
-    },
-    tickets: {
-      available: data.tickets_available || 0,
-      price: data.ticket_price || 0
-    },
-    reward: {
-      cardNumber: data.reward_card_number || '',
-      cardName: data.reward_card_name || ''
-    },
-    image: data.image_url || '',
-    reviews: data.reviews || {
-      rating: 0,
-      count: 0,
-      comments: []
-    }
-  };
-  
-  console.log('Fetched quest:', { id: quest.id, title: quest.title });
-  
-  return quest;
 }

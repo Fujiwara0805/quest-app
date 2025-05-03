@@ -13,11 +13,6 @@ export interface Quest {
     available: number;
     price?: number;
   };
-  // 削除予定
-  // reward: {
-  //   cardNumber?: string;
-  //   cardName: string;
-  // };
   image?: string;
   reviews?: {
     rating: number;
@@ -30,12 +25,14 @@ export interface Quest {
       date: string | Date;
     }[];
   };
+  category: string;
 }
 
 export interface QuestFormData {
   title: string;
   description: string;
   difficulty: string;
+  category: string;
   questDate: string | null;
   startTime: string;
   address: string;
@@ -44,9 +41,6 @@ export interface QuestFormData {
   ticketPrice: number | null;
   imageUrl: string;
   imagePath: string;
-  // 削除予定
-  // rewardCardNumber: string;
-  // rewardCardName: string;
 }
 
 export interface QuestPreviewData {
@@ -63,10 +57,5 @@ export interface QuestPreviewData {
     available: number;
     price: number;
   };
-  // 削除予定
-  // reward: {
-  //   cardNumber: string;
-  //   cardName: string;
-  // };
   image: string;
 }

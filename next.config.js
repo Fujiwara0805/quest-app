@@ -13,6 +13,11 @@ const nextConfig = {
       },
     ],
   },
+  env: {
+    NEXT_PUBLIC_API_URL: process.env.NODE_ENV === 'production' 
+      ? 'https://quest-app-iota.vercel.app/' // 本番環境URL
+      : 'http://localhost:3000' // 開発環境URL
+  },
 };
 
 module.exports = nextConfig;

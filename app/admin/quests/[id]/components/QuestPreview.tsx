@@ -1,7 +1,7 @@
 'use client';
 import { Card, CardContent } from '@/components/ui/card';
 import Image from 'next/image';
-import { Clock, MapPin, Users, Trophy } from 'lucide-react';
+import { Clock, MapPin, Users, Trophy, Tag } from 'lucide-react';
 import { FaImage } from 'react-icons/fa';
 
 interface QuestPreviewProps {
@@ -11,6 +11,7 @@ interface QuestPreviewProps {
     date: Date | null;
     startTime: string;
     difficulty: string;
+    category?: string;
     location: {
       address: string;
       access: string;
@@ -18,10 +19,6 @@ interface QuestPreviewProps {
     tickets: {
       available: number;
       price: number;
-    };
-    reward: {
-      cardNumber: string;
-      cardName: string;
     };
     image: string;
   };
@@ -71,6 +68,11 @@ export function QuestPreview({ quest }: QuestPreviewProps) {
               <span className={`bg-black/60 backdrop-blur-sm px-3 py-1.5 rounded-md text-sm ${getDifficultyColor(quest.difficulty)}`}>
                 難易度 {quest.difficulty}
               </span>
+              {quest.category && (
+                <span className="bg-black/60 backdrop-blur-sm px-3 py-1.5 rounded-md text-purple-300 text-sm">
+                  {quest.category}
+                </span>
+              )}
             </div>
             <h1 className="text-xl sm:text-2xl font-bold text-white mb-2 line-clamp-2">
               {quest.title || 'クエストタイトル'}
@@ -96,6 +98,12 @@ export function QuestPreview({ quest }: QuestPreviewProps) {
                 <p className="text-sm text-[#E8D4B9]/60">{quest.location.access || 'アクセス情報なし'}</p>
               </div>
             </div>
+            {quest.category && (
+              <div className="flex items-center text-[#E8D4B9]">
+                <Tag className="w-5 h-5 mr-3 flex-shrink-0" />
+                <span>{quest.category}</span>
+              </div>
+            )}
           </div>
           <div className="space-y-4">
             <div className="flex items-center">
@@ -104,10 +112,7 @@ export function QuestPreview({ quest }: QuestPreviewProps) {
                 残り {quest.tickets.available || '0'}枚
               </span>
             </div>
-            <div className="flex items-center text-[#E8D4B9]">
-              <Trophy className="w-5 h-5 mr-3 flex-shrink-0" />
-              <span>{quest.reward.cardName || '報酬カード未設定'}</span>
-            </div>
+
           </div>
         </div>
         
@@ -117,24 +122,7 @@ export function QuestPreview({ quest }: QuestPreviewProps) {
           <p className="text-[#E8D4B9]/90 leading-relaxed text-sm sm:text-base">
             {quest.description || 'クエスト説明はまだ入力されていません。'}
           </p>
-        </div>
-        
-        {/* 報酬カード情報 */}
-        <div className="border-t border-[#C0A172]/20 pt-6 mt-6">
-          <h2 className="text-lg font-medium text-[#E8D4B9] mb-3">報酬カード</h2>
-          <div className="bg-[#5C4D3C]/50 rounded-lg p-4 border border-[#C0A172]">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-[#E8D4B9]/80 text-sm">カード番号</p>
-                <p className="text-lg font-bold text-purple-400">{quest.reward.cardNumber || '未設定'}</p>
-              </div>
-              <div className="text-right">
-                <p className="text-[#E8D4B9]/80 text-sm">カード名</p>
-                <p className="text-lg font-bold text-purple-400">{quest.reward.cardName || '未設定'}</p>
-              </div>
-            </div>
-          </div>
-        </div>
+        </div>        
       </CardContent>
     </Card>
   );

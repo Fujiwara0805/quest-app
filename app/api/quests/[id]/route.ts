@@ -1,17 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 
-export async function GET(req: NextRequest) {
+interface Params {
+  params: {
+    id: string;
+  };
+}
+
+export async function GET(req: NextRequest, { params }: Params) {
   try {
-    // Prismaを使用してクエストを取得
-    const quests = await db.quest.findMany({
-      orderBy: {
-        createdAt: 'desc'
+    const { id } = params;
+    
+    // Prismaを使用して特定のクエストを取得
+    const quest = await db.quest.findUnique({
+      where: {
+        id: id
       }
     });
     
+    if (!quest) {
+      return NextResponse.json(
+        { message: 'クエストが見つかりません' },
+        { status: 404 }
+      );
+    }
+    
     // データをフロントエンド用の形式に変換
-    const formattedQuests = quests.map(quest => ({
+    const formattedQuest = {
       id: quest.id,
       title: quest.title,
       description: quest.description,
@@ -33,13 +48,13 @@ export async function GET(req: NextRequest) {
         comments: []
       },
       category: quest.category || ''
-    }));
+    };
     
-    return NextResponse.json({ quests: formattedQuests });
+    return NextResponse.json({ quest: formattedQuest });
   } catch (error: any) {
-    console.error('クエスト一覧取得エラー:', error);
+    console.error('クエスト詳細取得エラー:', error);
     return NextResponse.json(
-      { message: `クエスト一覧の取得に失敗しました: ${error.message}` },
+      { message: `クエスト詳細の取得に失敗しました: ${error.message}` },
       { status: 500 }
     );
   }

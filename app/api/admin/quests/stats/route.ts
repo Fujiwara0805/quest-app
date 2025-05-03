@@ -20,6 +20,13 @@ export async function GET(req: NextRequest) {
     
     // 最近のクエストを取得
     const recentQuests = await db.quest.findMany({
+      select: {
+        id: true,
+        title: true,
+        createdAt: true,
+        // 必要な他のフィールドをここに追加
+        // rewardCardNumber フィールドは削除または除外する
+      },
       orderBy: {
         createdAt: 'desc',
       },

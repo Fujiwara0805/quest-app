@@ -21,7 +21,6 @@ model Account {
   scope             String?
   id_token          String? @db.Text
   session_state     String?
-
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
@@ -46,7 +45,7 @@ model User {
   updatedAt     DateTime  @default(now()) @updatedAt @map("updated_at")
   accounts      Account[]
   sessions      Session[]
-  cards         Card[]
+  // cards         Card[]
   stripeCustomerId String? @map("stripe_customer_id")
   stripSubscriptionId String? @map("strip_subscription_id")
   stripePriceId String? @map("stripe_price_id")
@@ -69,6 +68,7 @@ model Quest {
   title            String
   description      String?
   difficulty       String?
+  category         String?
   questDate        DateTime? @map("quest_date")
   startTime        String?  @map("start_time")
   address          String?
@@ -78,32 +78,13 @@ model Quest {
   imageUrl         String?  @map("image_url")
   imagePath        String?  @map("image_path")
   reviews          Json?
-  rewardCardNumber String?  @map("reward_card_number")
-  rewardCardName   String?  @map("reward_card_name")
   createdAt        DateTime @default(now()) @map("created_at")
   updatedAt        DateTime @default(now()) @updatedAt @map("updated_at")
-  cards            Card[]
   tickets          Ticket[]
   payments         Payment[]
   reservations     Reservation[]
 
   @@map("quests")
-}
-
-model Card {
-  id         String    @id @default(uuid())
-  cardNumber String    @map("card_number")
-  cardName   String    @map("card_name")
-  questId    String?   @map("quest_id")
-  userId     String?   @map("user_id")
-  status     String?
-  issuedAt   DateTime? @map("issued_at")
-  createdAt  DateTime  @default(now()) @map("created_at")
-  updatedAt  DateTime  @default(now()) @updatedAt @map("updated_at")
-  quest      Quest?    @relation(fields: [questId], references: [id], onDelete: SetNull)
-  user       User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
-
-  @@map("cards")
 }
 
 model Payment {
@@ -116,7 +97,6 @@ model Payment {
   paymentIntentId String   @unique
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-
   user    User     @relation(fields: [userId], references: [id])
   quest   Quest?   @relation(fields: [questId], references: [id])
   tickets Ticket[]
@@ -130,7 +110,6 @@ model Ticket {
   status    String   // 'active', 'used', 'cancelled'
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
   user    User    @relation(fields: [userId], references: [id])
   quest   Quest   @relation(fields: [questId], references: [id])
   payment Payment @relation(fields: [paymentId], references: [id])

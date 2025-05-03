@@ -16,7 +16,18 @@ export async function GET(req: NextRequest) {
     }
 
     // クエスト一覧を取得
-    const quests = await  db.quest.findMany({
+    const quests = await db.quest.findMany({
+      select: {
+        id: true,
+        title: true,
+        questDate: true,
+        difficulty: true,
+        ticketsAvailable: true,
+        ticketPrice: true,
+        address: true,
+        imageUrl: true,
+        createdAt: true,
+      },
       orderBy: {
         questDate: 'desc',
       },

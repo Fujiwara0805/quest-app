@@ -55,8 +55,10 @@ export default function QuestsListPage() {
       <PageHeader title="クエスト一覧画面" />
       <div className="container mx-auto px-4 py-4 flex-grow">
         {/* ヘッダーとの間に余白を追加 */}
-        <div className="mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+        <div className="mb-6 flex flex-col sm:flex-row justify-between items-center gap-2">
+          <div className="w-full sm:flex-1">
+            <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+          </div>
           
           <Link
             href="/admin/quests/create"

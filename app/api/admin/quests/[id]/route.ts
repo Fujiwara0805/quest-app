@@ -26,6 +26,23 @@ export async function GET(
     // クエスト詳細を取得
     const quest = await db.quest.findUnique({
       where: { id },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        questDate: true,
+        startTime: true,
+        difficulty: true,
+        category: true,
+        address: true,
+        access: true,
+        ticketsAvailable: true,
+        ticketPrice: true,
+        imageUrl: true,
+        imagePath: true,
+        createdAt: true,
+        updatedAt: true,
+      }
     });
 
     if (!quest) {
@@ -57,30 +74,53 @@ export async function PUT(
     // 既存のクエストを確認
     const existingQuest = await db.quest.findUnique({
       where: { id },
+      select: {
+        id: true,
+        imagePath: true,
+      }
     });
 
     if (!existingQuest) {
       return NextResponse.json({ error: 'クエストが見つかりません' }, { status: 404 });
     }
     
+    // 更新用のデータを準備
+    const updateData = {
+      title: data.title,
+      description: data.description,
+      questDate: data.questDate,
+      startTime: data.startTime,
+      difficulty: data.difficulty,
+      category: data.category,
+      address: data.address,
+      access: data.access,
+      ticketsAvailable: data.ticketsAvailable,
+      ticketPrice: data.ticketPrice,
+      imageUrl: data.imageUrl,
+      imagePath: data.imagePath,
+    };
+    
     // クエストを更新
     const updatedQuest = await db.quest.update({
       where: { id },
-      data: {
-        title: data.title,
-        description: data.description,
-        questDate: data.questDate,
-        startTime: data.startTime,
-        difficulty: data.difficulty,
-        address: data.address,
-        access: data.access,
-        ticketsAvailable: data.ticketsAvailable,
-        ticketPrice: data.ticketPrice,
-        imageUrl: data.imageUrl,
-        imagePath: data.imagePath,
-        rewardCardNumber: data.rewardCardNumber,
-        rewardCardName: data.rewardCardName,
-      },
+      data: updateData,
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        questDate: true,
+        startTime: true,
+        difficulty: true,
+        category: true,
+        address: true,
+        access: true,
+        ticketsAvailable: true,
+        ticketPrice: true,
+        imageUrl: true,
+        imagePath: true,
+        createdAt: true,
+        updatedAt: true,
+      }
     });
 
     return NextResponse.json({ quest: updatedQuest });
@@ -107,6 +147,10 @@ export async function DELETE(
     // 既存のクエストを確認
     const existingQuest = await db.quest.findUnique({
       where: { id },
+      select: {
+        id: true,
+        imagePath: true,
+      }
     });
 
     if (!existingQuest) {
