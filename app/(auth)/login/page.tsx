@@ -40,27 +40,38 @@ function LoginForm() {
     setError('');
     
     try {
-      // 本番環境で redirect: true を使用して直接リダイレクトさせる
+      // テストアカウントの場合
+      if (email === 'test@gmail.com' && password === '2025') {
+        // callbackUrlが指定されている場合はそれを使用
+        const searchParams = new URLSearchParams(window.location.search);
+        const callbackUrl = searchParams.get('callbackUrl') || '/quests';
+        
+        // redirect: true で明示的にリダイレクト
+        await signIn('credentials', {
+          redirect: true,
+          email,
+          password,
+          callbackUrl: callbackUrl,
+        });
+        return; // この後の処理は実行しない
+      }
+      
+      // その他のアカウントの処理（既存コード）
       if (process.env.NODE_ENV === "production") {
-        // 管理者アカウントの場合
         if (email === 'quest202412@gmail.com') {
           await signIn('credentials', {
             email,
             password,
             callbackUrl: '/admin/dashboard',
           });
-        } 
-        // テストアカウントを含む一般ユーザーの場合
-        else {
+        } else {
           await signIn('credentials', {
             email,
             password,
             callbackUrl: '/quests',
           });
         }
-      }
-      // 開発環境ではこれまでどおりの処理
-      else {
+      } else {
         const result = await signIn('credentials', {
           redirect: false,
           email,
@@ -70,7 +81,6 @@ function LoginForm() {
         if (result?.error) {
           setError('メールアドレスまたはパスワードが正しくありません');
         } else if (result?.ok) {
-          // ログイン成功後、メールアドレスに基づいてリダイレクト
           if (email === 'quest202412@gmail.com') {
             router.push('/admin/dashboard');
           } else {
@@ -80,6 +90,7 @@ function LoginForm() {
       }
     } catch (err) {
       setError('ログイン中にエラーが発生しました');
+    } finally {
       setLoading(false);
     }
   };
