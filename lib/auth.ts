@@ -171,107 +171,29 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
     async redirect({ url, baseUrl }) {
-      console.log("リダイレクト関数実行: ", { url, baseUrl });
-      
-      try {
-        // URLをデコードして実際の値を確認
-        const decodedUrl = decodeURIComponent(url);
-        console.log("デコードされたURL: ", decodedUrl);
-        
-        // テストアカウントのリダイレクト処理
-        if (url.includes('/api/auth/callback/credentials') || url.includes('/api/auth/signin/credentials')) {
-          console.log("クレデンシャルログイン後のリダイレクト");
-          return `${baseUrl}/quests`;
-        }
-        
-        // Googleログインのコールバック時
-        if (url.includes('/api/auth/callback/google')) {
-          console.log("Google認証後のリダイレクト");
-          
-          // callbackUrlパラメータを直接解析してみる
-          const urlObj = new URL(url);
-          const callbackParam = urlObj.searchParams.get('callbackUrl');
-          if (callbackParam) {
-            console.log("コールバックURLのパラメータが存在: ", callbackParam);
-            if (callbackParam.includes('/admin/dashboard')) {
-              return `${baseUrl}/admin/dashboard`;
-            }
-            return callbackParam.startsWith('/') ? `${baseUrl}${callbackParam}` : callbackParam;
-          }
-          
-          // デフォルトでクエスト一覧にリダイレクト
-          return `${baseUrl}/quests`;
-        }
-        
-        // callbackUrlパラメータが指定されている場合はそれを使用
-        if (url.includes('callbackUrl=')) {
-          // URLSearchParamsを使った解析
-          const params = new URLSearchParams(url.split('?')[1]);
-          const callbackUrl = params.get('callbackUrl');
-          console.log("URLSearchParamsで取得したcallbackUrl: ", callbackUrl);
-          
-          if (callbackUrl) {
-            // callbackUrlをデコードする
-            const decodedCallback = decodeURIComponent(callbackUrl);
-            console.log("デコードされたcallbackUrl: ", decodedCallback);
-            
-            // 管理者ダッシュボードの場合
-            if (decodedCallback.includes('/admin/dashboard')) {
-              return `${baseUrl}/admin/dashboard`;
-            }
-            
-            // クエスト一覧の場合
-            if (decodedCallback.includes('/quests')) {
-              return `${baseUrl}/quests`;
-            }
-            
-            // 相対パスの場合はbaseUrlを追加
-            return decodedCallback.startsWith('/') ? `${baseUrl}${decodedCallback}` : decodedCallback;
-          }
-        }
-        
-        // URLに特定のパスが含まれる場合
-        if (url.includes('/admin/dashboard')) {
-          return `${baseUrl}/admin/dashboard`;
-        }
-        
-        // そのURLがそのまま使えるか確認
-        if (url.startsWith(baseUrl)) {
-          console.log("baseUrlで始まるURLをそのまま使用");
-          return url;
-        }
-        
-        // 絶対URLの場合の処理
-        if (url.startsWith("http")) {
-          // トークンなどの情報が含まれている可能性があるので、
-          // 最低限必要なパスだけを抽出してリダイレクト
-          try {
-            const urlObj = new URL(url);
-            const path = urlObj.pathname;
-            console.log("抽出されたパス: ", path);
-            
-            if (path.includes('/quests')) {
-              return `${baseUrl}/quests`;
-            }
-            if (path.includes('/admin/dashboard')) {
-              return `${baseUrl}/admin/dashboard`;
-            }
-          } catch (e) {
-            console.error("URL解析エラー:", e);
-          }
-          
-          // パスの解析に失敗した場合はベースURLに戻す
-          return baseUrl;
-        }
-        
-        // デフォルトのリダイレクト先
-        console.log("デフォルトのリダイレクト先を使用: /quests");
-        return `${baseUrl}/quests`;
-      } catch (error) {
-        console.error("リダイレクト処理中にエラーが発生しました:", error);
-        // エラー時は安全にクエスト一覧に遷移
-        return `${baseUrl}/quests`;
+      // 管理者ダッシュボードの場合
+      if (url.includes('/admin/dashboard')) {
+        return `${baseUrl}/admin/dashboard`;
       }
+      
+      // callbackUrlパラメータが含まれている場合
+      if (url.includes('callbackUrl=')) {
+        const params = new URLSearchParams(url.split('?')[1]);
+        const callbackUrl = params.get('callbackUrl');
+        
+        if (callbackUrl) {
+          const decodedCallback = decodeURIComponent(callbackUrl);
+          return decodedCallback.startsWith('/') ? `${baseUrl}${decodedCallback}` : decodedCallback;
+        }
+      }
+      
+      // URLがbaseUrlで始まる場合はそのまま使用
+      if (url.startsWith(baseUrl)) {
+        return url;
+      }
+      
+      // デフォルトのリダイレクト先
+      return `${baseUrl}/quests`;
     }
   },
   pages: {
