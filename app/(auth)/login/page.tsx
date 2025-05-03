@@ -57,36 +57,18 @@ function LoginForm() {
       }
       
       // その他のアカウントの処理（既存コード）
-      if (process.env.NODE_ENV === "production") {
-        if (email === 'quest202412@gmail.com') {
-          await signIn('credentials', {
-            email,
-            password,
-            callbackUrl: '/admin/dashboard',
-          });
-        } else {
-          await signIn('credentials', {
-            email,
-            password,
-            callbackUrl: '/quests',
-          });
-        }
-      } else {
-        const result = await signIn('credentials', {
-          redirect: false,
+      if (email === 'quest202412@gmail.com') {
+        await signIn('credentials', {
           email,
           password,
+          callbackUrl: '/admin/dashboard',
         });
-        
-        if (result?.error) {
-          setError('メールアドレスまたはパスワードが正しくありません');
-        } else if (result?.ok) {
-          if (email === 'quest202412@gmail.com') {
-            router.push('/admin/dashboard');
-          } else {
-            router.push('/quests');
-          }
-        }
+      } else {
+        await signIn('credentials', {
+          email,
+          password,
+          callbackUrl: '/quests',
+        });
       }
     } catch (err) {
       setError('ログイン中にエラーが発生しました');
