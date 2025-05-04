@@ -23,13 +23,19 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const errorFromUrl = searchParams.get('error');
   
-  // 既にログインしている場合はリダイレクト
+  // 既にログインしている場合はリダイレクト（スプラッシュ画面を経由させる）
   useEffect(() => {
     if (status === 'authenticated') {
-      if (session?.user?.role === 'admin' || session?.user?.email === 'quest202412@gmail.com') {
-        router.push('/admin/dashboard');
+      // スプラッシュ画面からのリダイレクトで来ていない場合のみ
+      const isFromSplash = sessionStorage.getItem('from_splash');
+      if (!isFromSplash) {
+        router.push('/');
       } else {
-        router.push('/quests');
+        if (session?.user?.role === 'admin' || session?.user?.email === 'quest202412@gmail.com') {
+          router.push('/admin/dashboard');
+        } else {
+          router.push('/quests');
+        }
       }
     }
   }, [status, session, router]);

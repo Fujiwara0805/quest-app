@@ -1,4 +1,3 @@
-
 import React, { Suspense } from 'react';
 import QuestListContainer from '../../components/quests/QuestListContainer';
 
