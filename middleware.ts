@@ -27,5 +27,13 @@ export async function middleware(request: NextRequest) {
 
 // Applies middleware only to matching paths
 export const config = {
-  matcher: ['/', '/quests/:path*', '/admin/:path*', '/login', '/register'],
+  matcher: [
+    '/',
+    '/(main)/:path*',
+    '/(auth)/:path*',
+    '/quests/:path*',
+    '/admin/:path*',
+    '/login',
+    '/register',
+  ],
 };

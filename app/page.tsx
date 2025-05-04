@@ -1,5 +1,10 @@
 import { Metadata } from 'next';
-import SplashScreen from '@/components/quests/SplashScreen';
+import dynamic from 'next/dynamic';
+
+// クライアントコンポーネントを動的インポート
+const SplashScreen = dynamic(() => import('@/components/quests/SplashScreen'), {
+  ssr: false // クライアントサイドでのみレンダリング
+});
 
 export const metadata: Metadata = {
   title: 'QUEST LAND | スプラッシュ',
