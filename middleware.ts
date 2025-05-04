@@ -7,17 +7,17 @@ export async function middleware(request: NextRequest) {
   const token = await getToken({ req: request, secret });
   const { pathname } = request.nextUrl;
 
-  // Root path "/" should always show splash screen
+  // ルートパスは常にアクセス可能
   if (pathname === '/') {
     return NextResponse.next();
   }
 
-  // Auth related paths don't need any redirects
+  // 認証関連パスは常にアクセス可能
   if (pathname.startsWith('/api/auth') || pathname === '/login' || pathname === '/register') {
     return NextResponse.next();
   }
 
-  // If trying to access protected routes without token, redirect to home (which will show splash screen)
+  // トークンなしで保護されたルートにアクセスしようとする場合、ルートにリダイレクト
   if (!token && (pathname.startsWith('/quests') || pathname.startsWith('/admin'))) {
     return NextResponse.redirect(new URL('/', request.url));
   }
@@ -25,15 +25,18 @@ export async function middleware(request: NextRequest) {
   return NextResponse.next();
 }
 
-// Applies middleware only to matching paths
+// Middlewareが適用されるパス
 export const config = {
   matcher: [
     '/',
-    '/(main)/:path*',
-    '/(auth)/:path*',
-    '/quests/:path*',
-    '/admin/:path*',
     '/login',
     '/register',
+    '/quests',
+    '/quests/:path*',
+    '/admin',
+    '/admin/:path*',
+    '/favorites',
+    '/reservations',
+    '/profile',
   ],
 };
