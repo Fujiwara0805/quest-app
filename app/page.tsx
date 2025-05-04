@@ -1,9 +1,8 @@
 import { Metadata } from 'next';
 import dynamic from 'next/dynamic';
-import Image from 'next/image';
 
 
-const ClientSplashScreen = dynamic(() => import('@/components/quests/SplashScreen'), {
+const SplashScreen = dynamic(() => import('@/components/quests/SplashScreen'), {
   ssr: false,
   loading: () => (
     <div className="fixed inset-0 bg-gradient-to-b from-[#2a1810] to-[#1a0f0a] flex flex-col items-center justify-center">
@@ -22,5 +21,5 @@ export const metadata: Metadata = {
 };
 
 export default function Home() {
-  return <ClientSplashScreen />;
+  return <SplashScreen />;
 }
