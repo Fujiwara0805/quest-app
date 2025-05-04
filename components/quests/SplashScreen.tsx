@@ -9,23 +9,20 @@ export default function SplashScreen() {
   const router = useRouter();
   const { data: session, status } = useSession();
   const [animationComplete, setAnimationComplete] = useState(false);
-  const [windowSize, setWindowSize] = useState({ width: 500, height: 500 });
+  // クライアントサイドでのレンダリングを安全に処理するための状態
+  const [dimensions, setDimensions] = useState({ width: 500, height: 500 });
   const [isMounted, setIsMounted] = useState(false);
 
-  // ロゴ文字のアニメーション用の配列
-  const logoWords = ["QUEST", "LAND"];
-
-  // windowオブジェクトへのアクセスをクライアントサイドに限定
+  // windowオブジェクトへのアクセスをクライアントサイドのみに限定
   useEffect(() => {
     setIsMounted(true);
-    setWindowSize({
+    setDimensions({
       width: window.innerWidth,
       height: window.innerHeight
     });
 
-    // リサイズ時にウィンドウサイズを更新
     const handleResize = () => {
-      setWindowSize({
+      setDimensions({
         width: window.innerWidth,
         height: window.innerHeight
       });
@@ -65,38 +62,52 @@ export default function SplashScreen() {
     return () => clearTimeout(timer);
   }, []);
 
+  // サーバーサイドレンダリング時またはマウント前はシンプルな表示を返す
+  if (!isMounted) {
+    return (
+      <div className="fixed inset-0 bg-gradient-to-b from-[#2a1810] to-[#1a0f0a] flex flex-col items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-5xl font-bold text-purple-600">QUEST</h1>
+          <h1 className="text-5xl font-bold text-[#E8D4B9]">LAND</h1>
+          <p className="mt-6 text-[#E8D4B9]/80 text-lg">あなたの冒険が地域を変える</p>
+        </div>
+      </div>
+    );
+  }
+
+  // ロゴ文字のアニメーション用の配列
+  const logoWords = ["QUEST", "LAND"];
+
   return (
     <div className="fixed inset-0 bg-gradient-to-b from-[#2a1810] to-[#1a0f0a] flex flex-col items-center justify-center overflow-hidden">
       {/* 背景のパターン */}
       <div className="absolute inset-0 bg-[url('/patterns/noise.png')] opacity-5" />
       
-      {/* 流れ星のような装飾 - クライアントサイドでのみレンダリング */}
-      {isMounted && (
-        <div className="absolute inset-0 overflow-hidden">
-          {[...Array(windowSize.width < 768 ? 5 : 10)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute w-1 h-1 rounded-full bg-purple-400"
-              initial={{ 
-                x: Math.random() * windowSize.width, 
-                y: -10,
-                opacity: 0 
-              }}
-              animate={{ 
-                x: Math.random() * windowSize.width,
-                y: windowSize.height + 10,
-                opacity: [0, 1, 0],
-              }}
-              transition={{ 
-                duration: Math.random() * 3 + 2, 
-                delay: Math.random() * 2,
-                repeat: Infinity,
-                repeatDelay: Math.random() * 3
-              }}
-            />
-          ))}
-        </div>
-      )}
+      {/* 流れ星のような装飾 - 安全なwindowサイズ使用 */}
+      <div className="absolute inset-0 overflow-hidden">
+        {[...Array(dimensions.width < 768 ? 5 : 10)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-1 h-1 rounded-full bg-purple-400"
+            initial={{ 
+              x: Math.random() * dimensions.width, 
+              y: -10,
+              opacity: 0 
+            }}
+            animate={{ 
+              x: Math.random() * dimensions.width,
+              y: dimensions.height + 10,
+              opacity: [0, 1, 0],
+            }}
+            transition={{ 
+              duration: Math.random() * 3 + 2, 
+              delay: Math.random() * 2,
+              repeat: Infinity,
+              repeatDelay: Math.random() * 3
+            }}
+          />
+        ))}
+      </div>
       
       {/* メインのロゴアニメーション */}
       <div className="relative z-10 px-4 w-full max-w-md mx-auto text-center">
@@ -106,7 +117,7 @@ export default function SplashScreen() {
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.5 }}
         >
-          {/* ロゴ文字 - レスポンシブ対応 */}
+          {/* ロゴ文字 */}
           <div className="flex flex-col items-center">
             {logoWords.map((word, index) => (
               <div key={index} className="flex flex-wrap justify-center">
@@ -131,7 +142,7 @@ export default function SplashScreen() {
             ))}
           </div>
           
-          {/* サブタイトル - レスポンシブ対応 */}
+          {/* サブタイトル */}
           <motion.p
             className="text-[#E8D4B9]/80 mt-4 sm:mt-6 text-base sm:text-lg"
             initial={{ opacity: 0 }}
@@ -142,7 +153,7 @@ export default function SplashScreen() {
           </motion.p>
         </motion.div>
         
-        {/* ローディングインジケーター - レスポンシブ対応 */}
+        {/* ローディングインジケーター */}
         <motion.div
           className="mt-8 sm:mt-12 flex flex-col items-center"
           initial={{ opacity: 0 }}
@@ -158,7 +169,7 @@ export default function SplashScreen() {
           <motion.div
             className="mt-4 sm:mt-6 h-1 bg-gradient-to-r from-purple-600 to-purple-400 rounded-full"
             initial={{ width: 0 }}
-            animate={{ width: windowSize.width < 640 ? 200 : 240 }}
+            animate={{ width: dimensions.width < 640 ? 200 : 240 }}
             transition={{ 
               delay: 1.8, 
               duration: 1.5, 

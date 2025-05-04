@@ -7,36 +7,32 @@ export async function middleware(request: NextRequest) {
   const token = await getToken({ req: request, secret });
   const { pathname } = request.nextUrl;
 
-  // ルートパスは常にアクセス可能
+  // ルートパスは常にアクセス可能（スプラッシュ画面）
   if (pathname === '/') {
     return NextResponse.next();
   }
 
-  // 認証関連パスは常にアクセス可能
+  // 認証関連のパスは常にアクセス可能
   if (pathname.startsWith('/api/auth') || pathname === '/login' || pathname === '/register') {
     return NextResponse.next();
   }
 
-  // トークンなしで保護されたルートにアクセスしようとする場合、ルートにリダイレクト
-  if (!token && (pathname.startsWith('/quests') || pathname.startsWith('/admin'))) {
+  // メインエリアの保護されたルート
+  if (!token && pathname.startsWith('/quests') || pathname.startsWith('/admin')) {
     return NextResponse.redirect(new URL('/', request.url));
   }
 
+  // その他の場合は通常通り処理
   return NextResponse.next();
 }
 
-// Middlewareが適用されるパス
+// 簡略化されたマッチャー
 export const config = {
   matcher: [
     '/',
     '/login',
     '/register',
-    '/quests',
     '/quests/:path*',
-    '/admin',
     '/admin/:path*',
-    '/favorites',
-    '/reservations',
-    '/profile',
   ],
 };

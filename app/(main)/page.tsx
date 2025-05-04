@@ -1,6 +1,16 @@
-import React from 'react';
-import QuestListContainer from '../../components/quests/QuestListContainer';
+import { redirect } from 'next/navigation';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/auth';
 
-export default function Page() {
-  return <QuestListContainer />;
+export default async function MainPage() {
+  // サーバーサイドでセッションを確認
+  const session = await getServerSession(authOptions);
+  
+  // 未ログインならルートページにリダイレクト
+  if (!session) {
+    redirect('/');
+  }
+  
+  // 常にクエスト一覧にリダイレクト
+  redirect('/quests');
 }
