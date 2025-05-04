@@ -24,7 +24,7 @@ export default function QuestListContainer() {
   
   // 検索関連の状態
   const [searchQuery, setSearchQuery] = useState('');
-  const [dateSearchEnabled, setDateSearchEnabled] = useState(true);
+  const [dateSearchEnabled, setDateSearchEnabled] = useState(false);
   const [showFavorites, setShowFavorites] = useState(false);
 
   // URLパラメータの処理
