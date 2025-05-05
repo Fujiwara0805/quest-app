@@ -27,7 +27,7 @@ export default async function Home() {
   // サーバーサイドでセッションを確認
   const session = await getServerSession(authOptions);
   
-  // ログイン済みの場合は直接リダイレクト
+  // ログイン済みの場合は適切なページに直接リダイレクト
   if (session) {
     if (session.user?.role === 'admin') {
       redirect('/admin/dashboard');
