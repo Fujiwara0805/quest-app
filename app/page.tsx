@@ -1,5 +1,8 @@
 import { Metadata } from 'next';
 import dynamic from 'next/dynamic';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/auth';
+import { redirect } from 'next/navigation';
 
 // SplashScreenを動的インポート（クライアントサイドのみ）
 const SplashScreen = dynamic(() => import('../components/quests/SplashScreen'), {
@@ -20,7 +23,19 @@ export const metadata: Metadata = {
   description: 'あなたの冒険が地域を変える',
 };
 
-export default function Home() {
-  // クライアントサイドでのみレンダリングするSplashScreen
+export default async function Home() {
+  // サーバーサイドでセッションを確認
+  const session = await getServerSession(authOptions);
+  
+  // ログイン済みの場合は直接リダイレクト
+  if (session) {
+    if (session.user?.role === 'admin') {
+      redirect('/admin/dashboard');
+    } else {
+      redirect('/quests');
+    }
+  }
+  
+  // 未ログインの場合はスプラッシュ画面を表示
   return <SplashScreen />;
 }
